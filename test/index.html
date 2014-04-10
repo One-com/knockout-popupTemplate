@@ -1,0 +1,35 @@
+<html>
+    <head>
+        <title>Mocha</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="vendor/mocha.css" />
+    </head>
+    <body>
+        <div id="mocha"></div>
+        <script>
+        var require = {
+            paths: {
+                jquery: 'vendor/jquery',
+                knockout: 'vendor/knockout',
+                mario: 'vendor/mario',
+                mocha: 'vendor/mocha',
+                require: 'vendor/require',
+                sinon: 'vendor/sinon',
+                text: 'vendor/text',
+                tpl: 'vendor/tpl',
+                unexpected: 'vendor/unexpected',
+                'unexpected-sinon': 'vendor/unexpected-sinon'
+            },
+            shim: {
+                'mocha': {
+                    exports: 'mocha'
+                },
+                'sinon': {
+                    exports: 'sinon'
+                }
+            }
+        };
+        </script>
+        <script src="vendor/require.js" data-main="runner"></script>
+    </body>
+</html>

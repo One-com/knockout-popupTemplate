@@ -1,13 +1,14 @@
 /*global defineTest, describe, it, beforeEach, afterEach*/
-defineTest([
+define([
     'unexpected',
     'sinon',
     'jquery',
     'knockout',
-    'common/bindings/knockout.popupTemplate',
-    'tpl!test/templates/popupTemplate.ko',
-    'tpl!test/templates/popupTemplate2.ko',
-    'tpl!test/templates/popupTemplate3.ko'
+    'setup-mocha',
+    '../knockout.popupTemplate',
+    'tpl!templates/popupTemplate.ko',
+    'tpl!templates/popupTemplate2.ko',
+    'tpl!templates/popupTemplate3.ko'
 ], function (unexpected, sinon, $, ko) {
     var expect = unexpected.clone();
     expect.addAssertion('[not] to be visible', function (expect, subject) {

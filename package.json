@@ -1,0 +1,31 @@
+{
+  "name": "one.com-knockout-popupTemplate",
+  "description": "A popup/dropdown binding for Knockout",
+  "main": "knockout.popupTemplate.js",
+  "version": "0.1.0",
+  "publishConfig": {
+    "registry": "http://npm.one.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git.one.com:/git/knockout-popupTemplate.git"
+  },
+  "peerDependencies": {
+    "jquery": ">=1.10",
+    "knockout": ">=3"
+  },
+  "dependencies": {
+    "jquery": "=1.11.0",
+    "knockout": "3.0.0",
+    "mario": "=1.4.3"
+  },
+  "devDependencies": {
+    "mocha": "~1.9.0",
+    "requirejs": "=2.1.6",
+    "requirejs-tpl": "=0.2.0",
+    "sinon": "=1.9.1",
+    "text": "git://github.com/requirejs/text.git",
+    "unexpected": "=3.1.1",
+    "unexpected-sinon": "=3.0.1"
+  }
+}
