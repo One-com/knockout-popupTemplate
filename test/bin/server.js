@@ -2,7 +2,7 @@
 // ex: filetype=javascript
 var static = require('node-static');
 
-var fileServer = new static.Server('test/');
+var fileServer = new static.Server('test/', { cache: false });
 
 require('http').createServer(function (request, response) {
     request.addListener('end', function () {

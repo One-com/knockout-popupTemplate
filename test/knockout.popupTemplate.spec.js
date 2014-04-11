@@ -1,16 +1,20 @@
-/*global defineTest, describe, it, beforeEach, afterEach*/
+/*global describe, it, beforeEach, afterEach*/
 define([
     'unexpected',
     'sinon',
     'jquery',
     'knockout',
+    'unexpected-sinon',
     'setup-mocha',
     'knockout.popupTemplate',
     'tpl!templates/popupTemplate.ko',
     'tpl!templates/popupTemplate2.ko',
     'tpl!templates/popupTemplate3.ko'
-], function (unexpected, sinon, $, ko) {
+], function (unexpected, sinon, $, ko, unexpectedSinon) {
     var expect = unexpected.clone();
+
+    expect.installPlugin(unexpectedSinon);
+
     expect.addAssertion('[not] to be visible', function (expect, subject) {
         var state = this.flags.not ? 'hidden' : 'visible';
         expect($(subject).css('visibility'), 'to be', state);
