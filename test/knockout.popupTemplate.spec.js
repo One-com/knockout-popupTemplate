@@ -5,7 +5,7 @@ define([
     'jquery',
     'knockout',
     'setup-mocha',
-    '../knockout.popupTemplate',
+    'knockout.popupTemplate',
     'tpl!templates/popupTemplate.ko',
     'tpl!templates/popupTemplate2.ko',
     'tpl!templates/popupTemplate3.ko'

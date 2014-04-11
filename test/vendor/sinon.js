@@ -1,1 +1,1 @@
-../../node_modules/sinon/lib/sinon.js
+../../node_modules/sinon/pkg/sinon.js

@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "mocha": "~1.9.0",
+    "node-static": "0.7.3",
     "requirejs": "=2.1.6",
     "requirejs-tpl": "=0.2.0",
     "sinon": "=1.9.1",
