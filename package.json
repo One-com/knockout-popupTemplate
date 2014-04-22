@@ -6,6 +6,9 @@
   "publishConfig": {
     "registry": "http://npm.one.com/"
   },
+  "scripts": {
+      "test": "mocha-phantomjs test/index.html"
+  },
   "repository": {
     "type": "git",
     "url": "git.one.com:/git/knockout-popupTemplate.git"
@@ -19,13 +22,11 @@
     "knockout": "3.0.0"
   },
   "devDependencies": {
-    "mocha": "~1.9.0",
-    "node-static": "0.7.3",
-    "requirejs": "=2.1.6",
-    "requirejs-tpl": "=0.2.0",
+    "mocha": "=1.9.0",
     "sinon": "=1.9.1",
-    "text": "git://github.com/requirejs/text.git",
     "unexpected": "=3.1.1",
-    "unexpected-sinon": "=3.0.1"
+    "unexpected-sinon": "=3.0.1",
+    "mocha-phantomjs": "=3.3.2",
+    "phantomjs": "=1.9.7-4"
   }
 }

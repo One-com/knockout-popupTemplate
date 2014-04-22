@@ -1,7 +1,14 @@
-define([
-    'jquery',
-    'knockout'
-], function ($, ko) {
+(function (root, factory) {
+    if (typeof exports === 'object') {
+        module.exports = factory(require('jquery'), require('knockout'));
+    } else if (typeof define === 'function' && define.amd) {
+        define(['jquery', 'knockout'], factory);
+    } else {
+        /* global $, ko */
+        root.BeforeUnload = factory($, ko);
+    }
+}(this, function ($, ko) {
+
     ko.bindingHandlers.popupTemplate = {
         init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
             var config = valueAccessor();
@@ -107,4 +114,7 @@ define([
             }
         }
     };
-});
+
+    return ko.bindingHandlers.popupTemplate;
+
+}));
