@@ -44,23 +44,10 @@ define([
                 $popupHolder.offset(position);
             }
 
-            function openPopupHandler(event) {
-                if (event.which === 1) {
-                    openPopup();
-                }
-            }
-
-            function addOpenHandler() {
-                $element.on('mousedown.popupTemplate', openPopupHandler);
-            }
-            function removeOpenHandler() {
-                $element.off('mousedown.popupTemplate', openPopupHandler);
-            }
-
             function closePopupHandler(event) {
                 if (event.which === 1 && !$element.is(event.target) && !$element.has(event.target).length &&
                     !$popupHolder.is(event.target) && !$popupHolder.has(event.target).length) {
-                    closePopup();
+                    togglePopup();
                 }
             }
             function addCloseHandler() {
@@ -95,23 +82,28 @@ define([
                 closer();
             }
 
-            addOpenHandler();
+            $element.on('mousedown.popupTemplate', function (event) {
+                if (event.which === 1) {
+                    togglePopup();
+                }
+            });
 
-            function openPopup() {
-                config.beforeOpen();
-                opener();
-                removeOpenHandler();
-                addCloseHandler();
-                config.openState(true);
-                config.afterOpen();
-            }
-            function closePopup() {
-                config.beforeClose();
-                closer();
-                removeCloseHandler();
-                addOpenHandler();
-                config.openState(false);
-                config.afterClose();
+            function togglePopup() {
+                if (config.openState()) {
+                    // if the popup is open
+                    config.beforeClose();
+                    closer();
+                    removeCloseHandler();
+                    config.openState(false);
+                    config.afterClose();
+                } else {
+                    // if the popup is closed
+                    config.beforeOpen();
+                    opener();
+                    addCloseHandler();
+                    config.openState(true);
+                    config.afterOpen();
+                }
             }
         }
     };

@@ -76,6 +76,11 @@ define([
                 click('body'); // Click outside
                 expect('body>.popupTemplate>#popupTemplate', 'not to be visible');
             });
+            it('hides the popup again on click outside popup', function () {
+                click('#anchor1'); // Show popup
+                click('#anchor1'); // Click inside
+                expect('body>.popupTemplate>#popupTemplate', 'not to be visible');
+            });
 
             it('works even with many open/closes', function () {
                 for (var i = 0; i < 20; i += 1) {
