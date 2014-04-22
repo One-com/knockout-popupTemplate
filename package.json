@@ -16,8 +16,7 @@
   },
   "dependencies": {
     "jquery": "=1.11.0",
-    "knockout": "3.0.0",
-    "mario": "=1.4.3"
+    "knockout": "3.0.0"
   },
   "devDependencies": {
     "mocha": "~1.9.0",

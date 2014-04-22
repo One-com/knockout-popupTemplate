@@ -1,8 +1,7 @@
 define([
     'jquery',
-    'knockout',
-    'mario'
-], function ($, ko, mario) {
+    'knockout'
+], function ($, ko) {
     ko.bindingHandlers.popupTemplate = {
         init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
             var config = valueAccessor();
