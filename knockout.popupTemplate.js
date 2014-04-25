@@ -35,12 +35,11 @@
                     bindingContext.createChildContext(ko.utils.unwrapObservable(config.data, config.as)) :  // Given an explicit 'data' value, we create a child binding context for it
                     bindingContext;                                               // Given no explicit 'data' value, we retain the same binding context
                 ko.renderTemplate(config.template, innerBindingContext, [], $popupHolder[0]);
-                ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                    removePopup();
-                });
+                ko.utils.domNodeDisposal.addDisposeCallback(element, removePopup);
             }
 
             function removePopup() {
+                removeCloseHandler();
                 $popupHolder.remove();
             }
 
