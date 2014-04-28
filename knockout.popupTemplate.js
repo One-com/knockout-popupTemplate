@@ -9,6 +9,9 @@
     }
 }(this, function ($, ko) {
 
+    var HORIZONTAL_POSITIONS = ['outside-left', 'inside-left', 'middle', 'inside-right', 'outside-right'];
+    var VERTICAL_POSITIONS = ['outside-top', 'inside-top', 'middle', 'inside-bottom', 'outside-bottom'];
+
     ko.bindingHandlers.popupTemplate = {
         init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
             var config = valueAccessor();
@@ -24,6 +27,24 @@
             config.afterClose = config.afterClose || function () {};
             config.openState = ko.isObservable(config.openState) ? config.openState : ko.observable();
             config.openState(false);
+            config.positioning = config.positioning || {};
+            if (HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal) !== -1) {
+                config.positioning.horizontal = ko.observable(config.positioning.horizontal);
+            } else if (ko.isObservable(config.positioning.horizontal) && HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal()) !== -1) {
+            } else if (ko.isObservable(config.positioning.horizontal)) {
+                config.positioning.horizontal('inside-left');
+            } else {
+                config.positioning.horizontal = ko.observable('inside-left');
+            }
+            if (VERTICAL_POSITIONS.indexOf(config.positioning.vertical) !== -1) {
+                config.positioning.vertical = ko.observable(config.positioning.vertical);
+            } else if (ko.isObservable(config.positioning.vertical) && VERTICAL_POSITIONS.indexOf(config.positioning.vertical()) !== -1) {
+            } else if (ko.isObservable(config.positioning.vertical)) {
+                config.positioning.vertical('outside-bottom');
+            } else {
+                config.positioning.vertical = ko.observable('outside-bottom');
+            }
+
             var $element = $(element);
             var $popupHolder;
 
@@ -46,9 +67,53 @@
 
             function repositionPopup() {
                 var position = $element.offset();
-                position.top += $element.height();
+                switch (config.positioning.horizontal()) {
+                case 'outside-left':
+                    position.left -= $element.width();
+                    break;
+                case 'inside-left':
+                    // No change in left coord.
+                    break;
+                case 'middle':
+                    position.left += Math.round($element.width() / 2);
+                    position.left -= Math.round($popupHolder.width() / 2);
+                    break;
+                case 'inside-right':
+                    position.left += $element.width();
+                    position.left -= $popupHolder.width();
+                    break;
+                case 'outside-right':
+                    position.left += $element.width();
+                    break;
+                }
+                switch (config.positioning.vertical()) {
+                case 'outside-top':
+                    position.top -= $popupHolder.height();
+                    break;
+                case 'inside-top':
+                    // No change i top coord
+                    break;
+                case 'middle':
+                    position.top += Math.round($element.height() / 2);
+                    position.top -= Math.round($popupHolder.height() / 2);
+                    break;
+                case 'inside-bottom':
+                    position.top += $element.height();
+                    position.top -= $popupHolder.height();
+                    break;
+                case 'outside-bottom':
+                    position.top += $element.height();
+                    break;
+                }
                 $popupHolder.offset(position);
             }
+
+            var horizPositionSub = config.positioning.horizontal.subscribe(repositionPopup);
+            var vertPositionSub = config.positioning.vertical.subscribe(repositionPopup);
+            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                horizPositionSub.dispose();
+                vertPositionSub.dispose();
+            });
 
             function closePopupHandler(event) {
                 if (event.which === 1 && !$element.is(event.target) && !$element.has(event.target).length &&
@@ -71,6 +136,7 @@
 
             function showPopup() {
                 $popupHolder.css('visibility', 'visible');
+                repositionPopup();
             }
 
             var opener, closer;
@@ -82,7 +148,6 @@
                 closer = removePopup;
             } else {
                 renderPopup();
-                repositionPopup();
                 opener = showPopup;
                 closer = hidePopup;
                 closer();

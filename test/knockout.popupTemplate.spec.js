@@ -39,14 +39,6 @@ describe('popupTemplate', function () {
             expect('body>.popupTemplate>#popupTemplate', 'to be rendered');
         });
 
-        it('positions the popup just below the element, aligning left borders', function () {
-            var $anchor = $('#anchor1');
-            var popupPosition = $('body>.popupTemplate').offset();
-            var elementPosition = $anchor.offset();
-            expect(popupPosition.left, 'to be', elementPosition.left);
-            expect(popupPosition.top, 'to be', elementPosition.top + $anchor.height());
-        });
-
         it('hides the popup element at first', function () {
             expect('body>.popupTemplate>#popupTemplate', 'not to be visible');
         });
@@ -126,6 +118,15 @@ describe('popupTemplate', function () {
                 click($iframeBody.find('#clicktarget')); // Click in iframe
                 expect('body>.popupTemplate>#popupTemplate', 'not to be visible');
             }
+        });
+
+        it('positions the popup just below the element, aligning left borders', function () {
+            var $anchor = $('#anchor1');
+            click('#anchor1');
+            var popupPosition = $('body>.popupTemplate').offset();
+            var elementPosition = $anchor.offset();
+            expect(popupPosition.left, 'to be', elementPosition.left);
+            expect(popupPosition.top, 'to be', elementPosition.top + $anchor.height());
         });
     });
 
@@ -284,6 +285,232 @@ describe('popupTemplate', function () {
                 sub = popupState.subscribe(subfunc);
                 click('body'); // Click outside
                 expect(afterClose, 'was called once');
+            });
+        });
+
+        describe('positioning', function () {
+            var config;
+            beforeEach(function () {
+                $('<div id="anchor" data-bind="popupTemplate: config" style="margin-left: 300px; width: 200px; height: 50px;">Popup</div>').appendTo($testElement);
+            });
+
+            it('accepts string positioning', function () {
+                config = {
+                    template: 'popupTemplate',
+                    positioning: {
+                        horizontal: 'outside-right',
+                        vertical: 'middle'
+                    }
+                };
+                ko.applyBindings({ config: config }, $testElement[0]);
+                expect(config.positioning.horizontal, 'to equal', ko.observable('outside-right'));
+                expect(config.positioning.vertical, 'to equal', ko.observable('middle'));
+            });
+
+            it('accepts empty or invalid observable positioning', function () {
+                config = {
+                    template: 'popupTemplate',
+                    positioning: {
+                        horizontal: ko.observable(),
+                        vertical: ko.observable('invalid')
+                    }
+                };
+                ko.applyBindings({ config: config }, $testElement[0]);
+                expect(config.positioning.horizontal, 'to equal', ko.observable('inside-left'));
+                expect(config.positioning.vertical, 'to equal', ko.observable('outside-bottom'));
+            });
+
+            it('accepts valid observable positioning', function () {
+                config = {
+                    template: 'popupTemplate',
+                    positioning: {
+                        horizontal: ko.observable('middle'),
+                        vertical: ko.observable('outside-top')
+                    }
+                };
+                ko.applyBindings({ config: config }, $testElement[0]);
+                expect(config.positioning.horizontal, 'to equal', ko.observable('middle'));
+                expect(config.positioning.vertical, 'to equal', ko.observable('outside-top'));
+            });
+
+            it('horizontal alignment outside-left', function () {
+                config = {
+                    template: 'popupTemplate',
+                    positioning: {
+                        horizontal: 'outside-left'
+                    }
+                };
+                ko.applyBindings({ config: config }, $testElement[0]);
+                var $anchor = $('#anchor');
+                click('#anchor');
+                var popupPosition = $('body>.popupTemplate').offset();
+                var elementPosition = $anchor.offset();
+                expect(popupPosition.left, 'to be', elementPosition.left - $anchor.width());
+            });
+
+            it('horizontal alignment inside-left', function () {
+                config = {
+                    template: 'popupTemplate',
+                    positioning: {
+                        horizontal: 'inside-left'
+                    }
+                };
+                ko.applyBindings({ config: config }, $testElement[0]);
+                var $anchor = $('#anchor');
+                click('#anchor');
+                var popupPosition = $('body>.popupTemplate').offset();
+                var elementPosition = $anchor.offset();
+                expect(popupPosition.left, 'to be', elementPosition.left);
+            });
+
+            it('horizontal alignment middle', function () {
+                config = {
+                    template: 'popupTemplate',
+                    positioning: {
+                        horizontal: 'middle'
+                    }
+                };
+                ko.applyBindings({ config: config }, $testElement[0]);
+                function getMiddle(selector) {
+                    var $elem = $(selector);
+                    return $elem.offset().left + Math.round($elem.width() / 2);
+                }
+                config.positioning.horizontal('middle');
+                click('#anchor');
+                expect(getMiddle('body>.popupTemplate'), 'to be', getMiddle('#anchor'));
+            });
+
+            it('horizontal alignment inside-right', function () {
+                config = {
+                    template: 'popupTemplate',
+                    positioning: {
+                        horizontal: 'inside-right'
+                    }
+                };
+                ko.applyBindings({ config: config }, $testElement[0]);
+                var $anchor = $('#anchor');
+                var $popup = $('body>.popupTemplate');
+                click('#anchor');
+                var popupPosition = $popup.offset();
+                var elementPosition = $anchor.offset();
+                expect(popupPosition.left + $popup.width(), 'to be', elementPosition.left + $anchor.width());
+            });
+
+            it('horizontal alignment outside-right', function () {
+                config = {
+                    template: 'popupTemplate',
+                    positioning: {
+                        horizontal: 'outside-right'
+                    }
+                };
+                ko.applyBindings({ config: config }, $testElement[0]);
+                var $anchor = $('#anchor');
+                var $popup = $('body>.popupTemplate');
+                click('#anchor');
+                var popupPosition = $popup.offset();
+                var elementPosition = $anchor.offset();
+                expect(popupPosition.left, 'to be', elementPosition.left + $anchor.width());
+            });
+
+            it('vertical alignment outside-top', function () {
+                config = {
+                    template: 'popupTemplate',
+                    positioning: {
+                        vertical: 'outside-top'
+                    }
+                };
+                ko.applyBindings({ config: config }, $testElement[0]);
+                var $anchor = $('#anchor');
+                var $popup = $('body>.popupTemplate');
+                click('#anchor');
+                var popupPosition = $('body>.popupTemplate').offset();
+                var elementPosition = $anchor.offset();
+                expect(popupPosition.top, 'to be', elementPosition.top - $popup.height());
+            });
+
+            it('vertical alignment inside-top', function () {
+                config = {
+                    template: 'popupTemplate',
+                    positioning: {
+                        vertical: 'inside-top'
+                    }
+                };
+                ko.applyBindings({ config: config }, $testElement[0]);
+                var $anchor = $('#anchor');
+                var $popup = $('body>.popupTemplate');
+                click('#anchor');
+                var popupPosition = $popup.offset();
+                var elementPosition = $anchor.offset();
+                expect(popupPosition.top, 'to be', elementPosition.top);
+            });
+
+            it('vertical alignment middle', function () {
+                config = {
+                    template: 'popupTemplate',
+                    positioning: {
+                        vertical: 'middle'
+                    }
+                };
+                ko.applyBindings({ config: config }, $testElement[0]);
+                function getMiddle(selector) {
+                    var $elem = $(selector);
+                    return $elem.offset().top + Math.round($elem.height() / 2);
+                }
+                config.positioning.vertical('middle');
+                click('#anchor');
+                expect(getMiddle('body>.popupTemplate'), 'to be', getMiddle('#anchor'));
+            });
+
+            it('vertical alignment inside-bottom', function () {
+                config = {
+                    template: 'popupTemplate',
+                    positioning: {
+                        vertical: 'inside-bottom'
+                    }
+                };
+                ko.applyBindings({ config: config }, $testElement[0]);
+                var $anchor = $('#anchor');
+                var $popup = $('body>.popupTemplate');
+                click('#anchor');
+                var popupPosition = $popup.offset();
+                var elementPosition = $anchor.offset();
+                expect(popupPosition.top + $popup.height(), 'to be', elementPosition.top + $anchor.height());
+            });
+
+
+            it('vertical alignment outside-bottom', function () {
+                config = {
+                    template: 'popupTemplate',
+                    positioning: {
+                        vertical: 'outside-bottom'
+                    }
+                };
+                ko.applyBindings({ config: config }, $testElement[0]);
+                var $anchor = $('#anchor');
+                click('#anchor');
+                var popupPosition = $('body>.popupTemplate').offset();
+                var elementPosition = $anchor.offset();
+                expect(popupPosition.top, 'to be', elementPosition.top + $anchor.height());
+            });
+
+            it('can reposition while open', function () {
+                config = {
+                    template: 'popupTemplate',
+                    positioning: {
+                        horizontal: ko.observable('inside-left'),
+                        vertical: ko.observable('outside-bottom')
+                    }
+                };
+                ko.applyBindings({ config: config }, $testElement[0]);
+                var $anchor = $('#anchor');
+                var $popup = $('body>.popupTemplate');
+                click('#anchor');
+                expect($popup.offset().left, 'to be', $anchor.offset().left);
+                expect($popup.offset().top, 'to be', $anchor.offset().top + $anchor.height());
+                config.positioning.horizontal('outside-left');
+                expect($popup.offset().left, 'to be', $anchor.offset().left - $anchor.width());
+                config.positioning.vertical('inside-bottom');
+                expect($popup.offset().top + $popup.height(), 'to be', $anchor.offset().top + $anchor.height());
             });
         });
     });
