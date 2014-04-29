@@ -70,7 +70,7 @@
                 var position = $element.offset();
                 switch (config.positioning.horizontal()) {
                 case 'outside-left':
-                    position.left -= $element.outerWidth();
+                    position.left -= $popupHolder.outerWidth();
                     break;
                 case 'inside-left':
                     // No change in left coord.

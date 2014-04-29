@@ -5,16 +5,16 @@
         <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
     </head>
     <body>
+        <div id="test" style="position: absolute; visibility: hidden;"></div>
         <div id="mocha"></div>
-        <div id="test"></div>
         <script type="text/html" id="popupTemplate">
-            <div id="popupTemplate">popup</div>
+            <div id="template" style="border: 1px solid black; height: 50px;">popup</div>
         </script>
         <script type="text/html" id="popupTemplate2">
-            <div id="popupTemplate" data-bind="text: testText"></div>
+            <div id="template" data-bind="text: testText"></div>
         </script>
         <script type="text/html" id="popupTemplate3">
-            <div id="popupTemplate3">popup</div>
+            <div id="template3">popup</div>
         </script>
         <script src="../node_modules/jquery/dist/jquery.js"></script>
         <script src="../node_modules/knockout/build/output/knockout-latest.js"></script>

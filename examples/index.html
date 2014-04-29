@@ -11,35 +11,19 @@
           <button data-bind="popupTemplate: 'test-template'">Show popup</button>
           <h1>Positioning</h1>
           <div class="positioning">
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-left', vertical: 'outside-top' } }">outside-left - outside-top</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-left', vertical: 'outside-top' } }">inside-left - outside-top</button>
               <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'middle', vertical: 'outside-top' } }">middle - outside-top</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-right', vertical: 'outside-top' } }">inside-right - outside-top</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-right', vertical: 'outside-top' } }">outside-right - outside-top</button>
               <br>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-left', vertical: 'inside-top' } }">outside-left - inside-top</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-left', vertical: 'inside-top' } }">inside-left - inside-top</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'middle', vertical: 'inside-top' } }">middle - inside-top</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-right', vertical: 'inside-top' } }">inside-right - inside-top</button>
+              <br>
               <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-right', vertical: 'inside-top' } }">outside-right - inside-top</button>
               <br>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-left', vertical: 'middle' } }">outside-left - middle</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-left', vertical: 'middle' } }">inside-left - middle</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'middle', vertical: 'middle' } }">middle - middle</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-right', vertical: 'middle' } }">inside-right - middle</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-right', vertical: 'middle' } }">outside-right - middle</button>
               <br>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-left', vertical: 'inside-bottom' } }">outside-left - inside-bottom</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-left', vertical: 'inside-bottom' } }">inside-left - inside-bottom</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'middle', vertical: 'inside-bottom' } }">middle - inside-bottom</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-right', vertical: 'inside-bottom' } }">inside-right - inside-bottom</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-right', vertical: 'inside-bottom' } }">outside-right - inside-bottom</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-left', vertical: 'middle' } }">outside-left - middle</button>
+              <br>
               <br>
               <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-left', vertical: 'outside-bottom' } }">outside-left - outside-bottom</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-left', vertical: 'outside-bottom' } }">inside-left - outside-bottom</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'middle', vertical: 'outside-bottom' } }">middle - outside-bottom</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-right', vertical: 'outside-bottom' } }">inside-right - outside-bottom</button>
-              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-right', vertical: 'outside-bottom' } }">outside-right - outside-bottom</button>
+              <br>
+              <br>
+              <button data-bind="popupTemplate: positionConfig">Click to select positioning</button>
           </div>
       </div>
       <script type="text/javascript" src="vendor/jquery-1.8.1.js"></script>
@@ -52,6 +36,29 @@
               <p>
                   You can place any content in the popup template you
                   want.
+              </p>
+          </div>
+      </script>
+      <script type="text/html" id="position-template">
+          <div class="popup">
+              <h1>Choose positioning</h1>
+              <p>
+                  Horizontal: <select data-bind="value: horizontal">
+                    <option>outside-left</option>
+                    <option>inside-left</option>
+                    <option>middle</option>
+                    <option>inside-right</option>
+                    <option>outside-right</option>
+                  </select>
+              </p>
+              <p>
+                  Vertical: <select data-bind="value: vertical">
+                    <option>outside-top</option>
+                    <option>inside-top</option>
+                    <option>middle</option>
+                    <option>inside-bottom</option>
+                    <option>outside-bottom</option>
+                  </select>
               </p>
           </div>
       </script>
