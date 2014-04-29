@@ -291,7 +291,7 @@ describe('popupTemplate', function () {
         describe('positioning', function () {
             var config;
             beforeEach(function () {
-                $('<div id="anchor" data-bind="popupTemplate: config" style="margin-left: 300px; width: 200px; height: 50px;">Popup</div>').appendTo($testElement);
+                $('<div id="anchor" data-bind="popupTemplate: config" style="margin-left: 300px; width: 200px; height: 50px; padding: 5px; border: 1px transparent;">Popup</div>').appendTo($testElement);
             });
 
             it('accepts string positioning', function () {
@@ -345,7 +345,7 @@ describe('popupTemplate', function () {
                 click('#anchor');
                 var popupPosition = $('body>.popupTemplate').offset();
                 var elementPosition = $anchor.offset();
-                expect(popupPosition.left, 'to be', elementPosition.left - $anchor.width());
+                expect(popupPosition.left, 'to be', elementPosition.left - $anchor.outerWidth());
             });
 
             it('horizontal alignment inside-left', function () {
@@ -371,13 +371,11 @@ describe('popupTemplate', function () {
                     }
                 };
                 ko.applyBindings({ config: config }, $testElement[0]);
-                function getMiddle(selector) {
-                    var $elem = $(selector);
-                    return $elem.offset().left + Math.round($elem.width() / 2);
-                }
                 config.positioning.horizontal('middle');
                 click('#anchor');
-                expect(getMiddle('body>.popupTemplate'), 'to be', getMiddle('#anchor'));
+                $anchor = $('#anchor');
+                $popup = $('body>.popupTemplate');
+                expect($popup.offset().left + Math.round($popup.width() / 2), 'to be', $anchor.offset().left + Math.round($anchor.outerWidth() / 2));
             });
 
             it('horizontal alignment inside-right', function () {
@@ -393,7 +391,7 @@ describe('popupTemplate', function () {
                 click('#anchor');
                 var popupPosition = $popup.offset();
                 var elementPosition = $anchor.offset();
-                expect(popupPosition.left + $popup.width(), 'to be', elementPosition.left + $anchor.width());
+                expect(popupPosition.left + $popup.width(), 'to be', elementPosition.left + $anchor.outerWidth());
             });
 
             it('horizontal alignment outside-right', function () {
@@ -409,7 +407,7 @@ describe('popupTemplate', function () {
                 click('#anchor');
                 var popupPosition = $popup.offset();
                 var elementPosition = $anchor.offset();
-                expect(popupPosition.left, 'to be', elementPosition.left + $anchor.width());
+                expect(popupPosition.left, 'to be', elementPosition.left + $anchor.outerWidth());
             });
 
             it('vertical alignment outside-top', function () {
@@ -452,13 +450,11 @@ describe('popupTemplate', function () {
                     }
                 };
                 ko.applyBindings({ config: config }, $testElement[0]);
-                function getMiddle(selector) {
-                    var $elem = $(selector);
-                    return $elem.offset().top + Math.round($elem.height() / 2);
-                }
                 config.positioning.vertical('middle');
+                var $anchor = $('#anchor');
+                var $popup = $('body>.popupTemplate');
                 click('#anchor');
-                expect(getMiddle('body>.popupTemplate'), 'to be', getMiddle('#anchor'));
+                expect($popup.offset().top + Math.round($popup.height() / 2), 'to be', $anchor.offset().top + Math.round($anchor.outerHeight() / 2));
             });
 
             it('vertical alignment inside-bottom', function () {
@@ -474,7 +470,7 @@ describe('popupTemplate', function () {
                 click('#anchor');
                 var popupPosition = $popup.offset();
                 var elementPosition = $anchor.offset();
-                expect(popupPosition.top + $popup.height(), 'to be', elementPosition.top + $anchor.height());
+                expect(popupPosition.top + $popup.height(), 'to be', elementPosition.top + $anchor.outerHeight());
             });
 
 
@@ -490,7 +486,7 @@ describe('popupTemplate', function () {
                 click('#anchor');
                 var popupPosition = $('body>.popupTemplate').offset();
                 var elementPosition = $anchor.offset();
-                expect(popupPosition.top, 'to be', elementPosition.top + $anchor.height());
+                expect(popupPosition.top, 'to be', elementPosition.top + $anchor.outerHeight());
             });
 
             it('can reposition while open', function () {
@@ -506,11 +502,11 @@ describe('popupTemplate', function () {
                 var $popup = $('body>.popupTemplate');
                 click('#anchor');
                 expect($popup.offset().left, 'to be', $anchor.offset().left);
-                expect($popup.offset().top, 'to be', $anchor.offset().top + $anchor.height());
+                expect($popup.offset().top, 'to be', $anchor.offset().top + $anchor.outerHeight());
                 config.positioning.horizontal('outside-left');
-                expect($popup.offset().left, 'to be', $anchor.offset().left - $anchor.width());
+                expect($popup.offset().left, 'to be', $anchor.offset().left - $anchor.outerWidth());
                 config.positioning.vertical('inside-bottom');
-                expect($popup.offset().top + $popup.height(), 'to be', $anchor.offset().top + $anchor.height());
+                expect($popup.offset().top + $popup.height(), 'to be', $anchor.offset().top + $anchor.outerHeight());
             });
         });
     });

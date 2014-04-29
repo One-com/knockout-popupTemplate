@@ -69,21 +69,21 @@
                 var position = $element.offset();
                 switch (config.positioning.horizontal()) {
                 case 'outside-left':
-                    position.left -= $element.width();
+                    position.left -= $element.outerWidth();
                     break;
                 case 'inside-left':
                     // No change in left coord.
                     break;
                 case 'middle':
-                    position.left += Math.round($element.width() / 2);
+                    position.left += Math.round($element.outerWidth() / 2);
                     position.left -= Math.round($popupHolder.width() / 2);
                     break;
                 case 'inside-right':
-                    position.left += $element.width();
+                    position.left += $element.outerWidth();
                     position.left -= $popupHolder.width();
                     break;
                 case 'outside-right':
-                    position.left += $element.width();
+                    position.left += $element.outerWidth();
                     break;
                 }
                 switch (config.positioning.vertical()) {
@@ -91,18 +91,18 @@
                     position.top -= $popupHolder.height();
                     break;
                 case 'inside-top':
-                    // No change i top coord
+                    // No change in top coord
                     break;
                 case 'middle':
-                    position.top += Math.round($element.height() / 2);
+                    position.top += Math.round($element.outerHeight() / 2);
                     position.top -= Math.round($popupHolder.height() / 2);
                     break;
                 case 'inside-bottom':
-                    position.top += $element.height();
+                    position.top += $element.outerHeight();
                     position.top -= $popupHolder.height();
                     break;
                 case 'outside-bottom':
-                    position.top += $element.height();
+                    position.top += $element.outerHeight();
                     break;
                 }
                 $popupHolder.offset(position);
