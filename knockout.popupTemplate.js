@@ -45,6 +45,7 @@
                 config.positioning.vertical = ko.observable('outside-bottom');
             }
 
+            var subscriptions = [];
             var $element = $(element);
             var $popupHolder;
 
@@ -108,12 +109,8 @@
                 $popupHolder.offset(position);
             }
 
-            var horizPositionSub = config.positioning.horizontal.subscribe(repositionPopup);
-            var vertPositionSub = config.positioning.vertical.subscribe(repositionPopup);
-            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                horizPositionSub.dispose();
-                vertPositionSub.dispose();
-            });
+            subscriptions.push(config.positioning.horizontal.subscribe(repositionPopup));
+            subscriptions.push(config.positioning.vertical.subscribe(repositionPopup));
 
             function closePopupHandler(event) {
                 if (event.which === 1 && !$element.is(event.target) && !$element.has(event.target).length &&
@@ -159,7 +156,7 @@
                 }
             });
 
-            config.openState.subscribe(function (newValue) {
+            subscriptions.push(config.openState.subscribe(function (newValue) {
                 if (newValue) {
                     // if the popup is being opened
                     config.beforeOpen();
@@ -173,6 +170,12 @@
                     removeCloseHandler();
                     config.afterClose();
                 }
+            }));
+
+            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                subscriptions.forEach(function (item) {
+                    item.dispose();
+                });
             });
         }
     };
