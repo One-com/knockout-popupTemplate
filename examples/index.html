@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+    <head>
+        <title>PopupTemplate Demo</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="style.css" type="text/css" media="screen" />
+    </head>
+    <body>
+      <div id="application">
+          <h1>Basic configuration</h1>
+          <button data-bind="popupTemplate: 'test-template'">Show popup</button>
+          <h1>Positioning</h1>
+          <div class="positioning">
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-left', vertical: 'outside-top' } }">outside-left - outside-top</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-left', vertical: 'outside-top' } }">inside-left - outside-top</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'middle', vertical: 'outside-top' } }">middle - outside-top</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-right', vertical: 'outside-top' } }">inside-right - outside-top</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-right', vertical: 'outside-top' } }">outside-right - outside-top</button>
+              <br>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-left', vertical: 'inside-top' } }">outside-left - inside-top</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-left', vertical: 'inside-top' } }">inside-left - inside-top</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'middle', vertical: 'inside-top' } }">middle - inside-top</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-right', vertical: 'inside-top' } }">inside-right - inside-top</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-right', vertical: 'inside-top' } }">outside-right - inside-top</button>
+              <br>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-left', vertical: 'middle' } }">outside-left - middle</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-left', vertical: 'middle' } }">inside-left - middle</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'middle', vertical: 'middle' } }">middle - middle</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-right', vertical: 'middle' } }">inside-right - middle</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-right', vertical: 'middle' } }">outside-right - middle</button>
+              <br>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-left', vertical: 'inside-bottom' } }">outside-left - inside-bottom</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-left', vertical: 'inside-bottom' } }">inside-left - inside-bottom</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'middle', vertical: 'inside-bottom' } }">middle - inside-bottom</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-right', vertical: 'inside-bottom' } }">inside-right - inside-bottom</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-right', vertical: 'inside-bottom' } }">outside-right - inside-bottom</button>
+              <br>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-left', vertical: 'outside-bottom' } }">outside-left - outside-bottom</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-left', vertical: 'outside-bottom' } }">inside-left - outside-bottom</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'middle', vertical: 'outside-bottom' } }">middle - outside-bottom</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'inside-right', vertical: 'outside-bottom' } }">inside-right - outside-bottom</button>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-right', vertical: 'outside-bottom' } }">outside-right - outside-bottom</button>
+          </div>
+      </div>
+      <script type="text/javascript" src="vendor/jquery-1.8.1.js"></script>
+      <script type="text/javascript" src="vendor/knockout-2.2.0.debug.js"></script>
+      <script type="text/javascript" src="../knockout.popupTemplate.js"></script>
+      <script type="text/javascript" src="main.js"></script>
+      <script type="text/html" id="test-template">
+          <div class="popup">
+              <h1>This is a popup</h1>
+              <p>
+                  You can place any content in the popup template you
+                  want.
+              </p>
+          </div>
+      </script>
+    </body>
+</html>

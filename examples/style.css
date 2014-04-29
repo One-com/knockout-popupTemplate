@@ -1,0 +1,34 @@
+body {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #333;
+    padding: 40px;
+}
+
+h1 {
+    font-size: 1.5em;
+    font-weight: 400;
+    margin: 0.3em 0;
+}
+
+p {
+    margin: 0.3em 0;
+}
+
+.popup {
+    border: thin #aaa solid;
+    -webkit-box-shadow: 1px 1px 4px rgba(50, 50, 50, 0.75);
+    -moz-box-shadow:    1px 1px 4px rgba(50, 50, 50, 0.75);
+    box-shadow:         1px 1px 4px rgba(50, 50, 50, 0.75);
+    padding: 0.3em 1em;
+    background-color: white;
+}
+
+.positioning {
+    text-align: center;
+}
+
+.positioning button {
+    width: 200px;
+}
