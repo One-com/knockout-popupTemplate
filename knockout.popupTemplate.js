@@ -118,7 +118,7 @@
             function closePopupHandler(event) {
                 if (event.which === 1 && !$element.is(event.target) && !$element.has(event.target).length &&
                     !$popupHolder.is(event.target) && !$popupHolder.has(event.target).length) {
-                    togglePopup();
+                    config.openState(false);
                 }
             }
             function addCloseHandler() {
@@ -155,27 +155,25 @@
 
             $element.on('mousedown.popupTemplate', function (event) {
                 if (event.which === 1) {
-                    togglePopup();
+                    config.openState(!config.openState());
                 }
             });
 
-            function togglePopup() {
-                if (config.openState()) {
-                    // if the popup is open
-                    config.beforeClose();
-                    closer();
-                    removeCloseHandler();
-                    config.openState(false);
-                    config.afterClose();
-                } else {
-                    // if the popup is closed
+            config.openState.subscribe(function (newValue) {
+                if (newValue) {
+                    // if the popup is being opened
                     config.beforeOpen();
                     opener();
                     addCloseHandler();
-                    config.openState(true);
                     config.afterOpen();
+                } else {
+                    // if the popup is closed closed
+                    config.beforeClose();
+                    closer();
+                    removeCloseHandler();
+                    config.afterClose();
                 }
-            }
+            });
         }
     };
 

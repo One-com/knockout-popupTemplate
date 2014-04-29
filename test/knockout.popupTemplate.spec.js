@@ -222,15 +222,26 @@ describe('popupTemplate', function () {
                 click('body'); // Click outside
                 expect(popupState(), 'to be false');
             });
+            it('closes the popup if config.openState is set to false', function () {
+                click('#test>div'); // Show popup
+                expect('body>.popupTemplate>#popupTemplate', 'to be visible');
+                popupState(false);
+                expect('body>.popupTemplate>#popupTemplate', 'not to be visible');
+            });
+            it('opens the popup if config.openState is set to true', function () {
+                expect('body>.popupTemplate>#popupTemplate', 'not to be visible');
+                popupState(true);
+                expect('body>.popupTemplate>#popupTemplate', 'to be visible');
+            });
         });
 
         describe('handlers', function () {
             var beforeOpen, afterOpen, beforeClose, afterClose, popupState;
             beforeEach(function () {
-                beforeOpen = sinon.stub();
-                afterOpen = sinon.stub();
-                beforeClose = sinon.stub();
-                afterClose = sinon.stub();
+                beforeOpen = sinon.spy();
+                afterOpen = sinon.spy();
+                beforeClose = sinon.spy();
+                afterClose = sinon.spy();
                 popupState = ko.observable();
                 $('<div data-bind="popupTemplate: config">Popup</div>').appendTo($testElement);
                 var bindingContext = {
@@ -246,44 +257,18 @@ describe('popupTemplate', function () {
                 ko.applyBindings(bindingContext, $testElement[0]);
             });
 
-            it('calls the beforeOpen handler before opening', function (done) {
-                expect(beforeOpen, 'was not called');
-                var sub, subFunc = function () {
-                    expect(beforeOpen, 'was called once');
-                    sub.dispose();
-                    done();
-                };
-                sub = popupState.subscribe(subFunc);
+            it('it calls the beforeOpen and afterOpen hooks in the right order', function () {
                 click('#test>div'); // Show popup
-            });
-            it('calls the afterOpen handler after opening', function () {
-                expect(afterOpen, 'was not called');
-                var sub, subfunc = function () {
-                    expect(afterOpen, 'was not called');
-                    sub.dispose();
-                };
-                sub = popupState.subscribe(subfunc);
-                click('#test>div'); // Show popup
+                expect([beforeOpen, afterOpen], 'given call order');
+                expect(beforeOpen, 'was called once');
                 expect(afterOpen, 'was called once');
             });
-            it('calls the beforeClose handler before closing', function (done) {
-                expect(beforeClose, 'was not called');
-                click('#test>div');
-                popupState.subscribe(function () {
-                    expect(beforeClose, 'was called once');
-                    done();
-                });
-                click('body'); // Click outside
-            });
-            it('calls the afterClose handler after closing', function () {
-                expect(afterClose, 'was not called');
+
+            it('it calls the beforeClose and afterClose hooks in the right order', function () {
                 click('#test>div'); // Show popup
-                var sub, subfunc = function () {
-                    expect(afterClose, 'was not called');
-                    sub.dispose();
-                };
-                sub = popupState.subscribe(subfunc);
-                click('body'); // Click outside
+                click('#test>div'); // Close popup
+                expect([beforeClose, afterClose], 'given call order');
+                expect(beforeClose, 'was called once');
                 expect(afterClose, 'was called once');
             });
         });
