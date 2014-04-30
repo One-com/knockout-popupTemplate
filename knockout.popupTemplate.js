@@ -25,8 +25,7 @@
             config.afterOpen = config.afterOpen || function () {};
             config.beforeClose = config.beforeClose || function () {};
             config.afterClose = config.afterClose || function () {};
-            config.openState = ko.isObservable(config.openState) ? config.openState : ko.observable();
-            config.openState(false);
+            config.openState = ko.isObservable(config.openState) ? config.openState : ko.observable(false);
             config.positioning = config.positioning || {};
             config.clickHandler = config.clickHandler === false ? false : true;
             if (HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal) !== -1) {
