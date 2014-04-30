@@ -273,6 +273,27 @@ describe('popupTemplate', function () {
             });
         });
 
+        describe('make the click handler on element optional', function () {
+            var openState;
+            beforeEach(function () {
+                openState = ko.observable(false);
+                $('<div data-bind="popupTemplate: config">Popup</div>').appendTo($testElement);
+                var bindingContext = {
+                    config: {
+                        template: 'popupTemplate',
+                        openState: openState,
+                        clickHandler: false
+                    }
+                };
+                ko.applyBindings(bindingContext, $testElement[0]);
+            });
+            it('should not open on click.', function () {
+                click('#test>div');
+                expect(openState(), 'to be false');
+                expect('body>.popupTemplate>#template', 'not to be visible');
+            });
+        });
+
         describe('positioning', function () {
             var config;
             beforeEach(function () {

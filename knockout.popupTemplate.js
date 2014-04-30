@@ -28,6 +28,7 @@
             config.openState = ko.isObservable(config.openState) ? config.openState : ko.observable();
             config.openState(false);
             config.positioning = config.positioning || {};
+            config.clickHandler = config.clickHandler === false ? false : true;
             if (HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal) !== -1) {
                 config.positioning.horizontal = ko.observable(config.positioning.horizontal);
             } else if (ko.isObservable(config.positioning.horizontal) && HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal()) !== -1) {
@@ -150,11 +151,13 @@
                 closer();
             }
 
-            $element.on('mousedown.popupTemplate', function (event) {
-                if (event.which === 1) {
-                    config.openState(!config.openState());
-                }
-            });
+            if (config.clickHandler) {
+                $element.on('mousedown.popupTemplate', function (event) {
+                    if (event.which === 1) {
+                        config.openState(!config.openState());
+                    }
+                });
+            }
 
             subscriptions.push(config.openState.subscribe(function (newValue) {
                 if (newValue) {
