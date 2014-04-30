@@ -2,7 +2,7 @@
   "name": "knockout-popup-template",
   "description": "A popup/dropdown binding for Knockout",
   "main": "knockout.popupTemplate.js",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "contributors": [
     {
       "name": "Gert K. Sønderby",
