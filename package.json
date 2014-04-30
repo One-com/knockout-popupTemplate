@@ -2,11 +2,20 @@
   "name": "knockout-popupTemplate",
   "description": "A popup/dropdown binding for Knockout",
   "main": "knockout.popupTemplate.js",
-  "version": "0.2.7",
+  "version": "0.3.0",
   "contributors": [
-    { "name": "Gert K. Sønderby", "email": "gert@one.com" },
-    { "name": "Gustav N. Olsen", "email": "gno@one.com" },
-    { "name": "Sune S. Simonsen", "email": "sss@one.com" }
+    {
+      "name": "Gert K. Sønderby",
+      "email": "gert@one.com"
+    },
+    {
+      "name": "Gustav N. Olsen",
+      "email": "gno@one.com"
+    },
+    {
+      "name": "Sune S. Simonsen",
+      "email": "sss@one.com"
+    }
   ],
   "scripts": {
     "test": "mocha-phantomjs test/index.html"
