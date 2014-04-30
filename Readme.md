@@ -51,6 +51,6 @@ These fields can contain either a string, or an observable containing a string. 
 
 # License
 
-Copyright &reg; 2014, One.com
+Copyright &copy; 2014, One.com
 
 knockout.popupTemplate is licensed under the BSD 3-clause license, as given at http://opensource.org/licenses/BSD-3-Clause
