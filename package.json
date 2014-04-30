@@ -1,17 +1,19 @@
 {
-  "name": "one.com-knockout-popupTemplate",
+  "name": "knockout-popupTemplate",
   "description": "A popup/dropdown binding for Knockout",
   "main": "knockout.popupTemplate.js",
   "version": "0.2.7",
-  "publishConfig": {
-    "registry": "http://npm.one.com/"
-  },
+  "contributors": [
+    { "name": "Gert K. Sønderby", "email": "gert@one.com" },
+    { "name": "Gustav N. Olsen", "email": "gno@one.com" },
+    { "name": "Sune S. Simonsen", "email": "sss@one.com" }
+  ],
   "scripts": {
     "test": "mocha-phantomjs test/index.html"
   },
   "repository": {
     "type": "git",
-    "url": "git.one.com:/git/knockout-popupTemplate.git"
+    "url": "git@github.com:One-com/knockout-popupTemplate.git"
   },
   "peerDependencies": {
     "jquery": ">=1.10",
@@ -29,5 +31,6 @@
     "unexpected-knockout": "=0.0.1",
     "mocha-phantomjs": "=3.3.2",
     "phantomjs": "=1.9.7-4"
-  }
+  },
+  "license": "BSD-3-Clause"
 }
