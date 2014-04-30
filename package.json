@@ -2,7 +2,7 @@
   "name": "one.com-knockout-popupTemplate",
   "description": "A popup/dropdown binding for Knockout",
   "main": "knockout.popupTemplate.js",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "publishConfig": {
     "registry": "http://npm.one.com/"
   },
