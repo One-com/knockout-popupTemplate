@@ -359,8 +359,8 @@ describe('popupTemplate', function () {
                 ko.applyBindings({ config: config }, $testElement[0]);
                 config.positioning.horizontal('middle');
                 click('#anchor');
-                $anchor = $('#anchor');
-                $popup = $('body>.popupTemplate');
+                var $anchor = $('#anchor');
+                var $popup = $('body>.popupTemplate');
                 expect($popup.offset().left + Math.round($popup.width() / 2), 'to be', $anchor.offset().left + Math.round($anchor.outerWidth() / 2));
             });
 
