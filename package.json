@@ -1,6 +1,6 @@
 {
   "name": "knockout-popup-template",
-  "description": "A popup/dropdown binding for Knockout",
+  "description": "A flexible, simple Knockout binding for popping up a template near an anchor element.",
   "main": "knockout.popupTemplate.js",
   "version": "0.3.1",
   "contributors": [
