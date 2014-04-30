@@ -49,6 +49,10 @@ These fields can contain either a string, or an observable containing a string. 
 - `'inside-bottom'`: Align the bottom edge of the popup with the bottom edge of the anchor.
 - `'outside-bottom'`: Align the top edge of the popup with the bottom edge of the anchor.
 
+## Examples
+
+http://one-com.github.io/knockout-popupTemplate/examples/index.html
+
 # License
 
 Copyright &copy; 2014, One.com
