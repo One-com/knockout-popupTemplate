@@ -92,6 +92,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             }
 
             function removePopup() {
+                config.openState(false);
                 removeCloseHandler();
                 $popupHolder.remove();
             }
