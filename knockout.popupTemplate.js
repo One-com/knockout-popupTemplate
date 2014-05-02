@@ -186,6 +186,8 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 $element.on('mousedown.popupTemplate', function (event) {
                     if (event.which === 1) {
                         config.openState(!config.openState());
+                        event.stopPropagation();
+                        event.preventDefault();
                     }
                 });
             }
