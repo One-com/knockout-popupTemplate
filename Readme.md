@@ -20,7 +20,8 @@ This will give the default behavior, outlined above. Alternatively, the binding 
 - `afterOpen`: An event handler to be called immediately after opening the popup.
 - `beforeClose`: An event handler to be called before closing the popup.
 - `afterClose`: An event handler to be called immediately after closing the popup.
-- `clickHandler`: If true, clicking the anchor does not open the popup. It may still be closed by clicking outside the popup.
+- `anchorHandler`: If false, clicking the anchor does not open or close the popup.
+- `outsideHandler`: If false, clicking outside the popup will not close it.
 - `positioning`: An object containing positioning information (see below).
 
 ```html

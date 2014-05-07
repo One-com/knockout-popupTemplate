@@ -208,10 +208,6 @@ describe('popupTemplate', function () {
                 ko.applyBindings(bindingContext, $testElement[0]);
             });
 
-            it('sets the state observable to false initially', function () {
-                expect(popupState(), 'to be false');
-            });
-
             it('sets the state observable to true when opening the popup', function () {
                 click('#test>div'); // Show popup
                 expect(popupState(), 'to be true');
@@ -273,7 +269,7 @@ describe('popupTemplate', function () {
             });
         });
 
-        describe('make the click handler on element optional', function () {
+        describe('make the anchor click handler optional', function () {
             var openState;
             beforeEach(function () {
                 openState = ko.observable(false);
@@ -282,15 +278,37 @@ describe('popupTemplate', function () {
                     config: {
                         template: 'popupTemplate',
                         openState: openState,
-                        clickHandler: false
+                        anchorHandler: false
                     }
                 };
                 ko.applyBindings(bindingContext, $testElement[0]);
             });
-            it('should not open on click.', function () {
+            it('should not open on click', function () {
                 click('#test>div');
                 expect(openState(), 'to be false');
                 expect('body>.popupTemplate>#template', 'not to be visible');
+            });
+        });
+
+        describe('make the outside click handler optional', function () {
+            var openState;
+            beforeEach(function () {
+                openState = ko.observable(false);
+                $('<div data-bind="popupTemplate: config">Popup</div>').appendTo($testElement);
+                var bindingContext = {
+                    config: {
+                        template: 'popupTemplate',
+                        openState: openState,
+                        outsideHandler: false
+                    }
+                };
+                ko.applyBindings(bindingContext, $testElement[0]);
+            });
+            it('should not close on body click.', function () {
+                click('#test>div'); // Show popup
+                click('body'); // Close popup
+                expect(openState(), 'to be true');
+                expect('body>.popupTemplate>#template', 'to be visible');
             });
         });
 

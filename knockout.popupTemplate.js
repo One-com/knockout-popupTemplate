@@ -58,7 +58,8 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             config.afterClose = config.afterClose || function () {};
             config.openState = ko.isObservable(config.openState) ? config.openState : ko.observable(false);
             config.positioning = config.positioning || {};
-            config.clickHandler = config.clickHandler === false ? false : true;
+            config.anchorHandler = config.anchorHandler === false ? false : true;
+            config.outsideHandler = config.outsideHandler === false ? false : true;
             if (HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal) !== -1) {
                 config.positioning.horizontal = ko.observable(config.positioning.horizontal);
             } else if (ko.isObservable(config.positioning.horizontal) && HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal()) !== -1) {
@@ -182,7 +183,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 closer();
             }
 
-            if (config.clickHandler) {
+            if (config.anchorHandler) {
                 $element.on('mousedown.popupTemplate', function (event) {
                     if (event.which === 1) {
                         config.openState(!config.openState());
@@ -198,13 +199,13 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                     $('body').trigger($.Event('mousedown', { which: 1 }));
                     config.beforeOpen();
                     opener();
-                    addCloseHandler();
+                    if (config.outsideHandler) addCloseHandler();
                     config.afterOpen();
                 } else {
                     // if the popup is closed closed
                     config.beforeClose();
                     closer();
-                    removeCloseHandler();
+                    if (config.outsideHandler) removeCloseHandler();
                     config.afterClose();
                 }
             }));
