@@ -216,7 +216,6 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             subscriptions.push(config.openState.subscribe(function (newValue) {
                 if (newValue) {
                     // if the popup is being opened
-                    $('body').trigger($.Event('mousedown', { which: 1 }));
                     config.beforeOpen();
                     opener();
                     if (config.outsideHandler) addCloseHandler();
