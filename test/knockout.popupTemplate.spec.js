@@ -470,7 +470,6 @@ describe('popupTemplate', function () {
                 click('#anchor');
                 var popupPosition = $popup.offset();
                 var elementPosition = $anchor.offset();
-                console.log(popupPosition.top, elementPosition.top, $popup.height());
                 expect(popupPosition.top, 'to be', elementPosition.top - $popup.height());
             });
 
