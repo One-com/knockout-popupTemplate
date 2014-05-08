@@ -178,6 +178,43 @@ describe('popupTemplate', function () {
             });
         });
 
+        describe('start open', function () {
+            describe('renderOnOpen', function () {
+                beforeEach(function () {
+                    $('<div data-bind="popupTemplate: config">Popup</div>').appendTo($testElement);
+                    var bindingContext = {
+                        config: {
+                            template: 'popupTemplate',
+                            openState: ko.observable(true)
+                        }
+                    };
+                    ko.applyBindings(bindingContext, $testElement[0]);
+                });
+                it('should be visible if openState is true', function () {
+                    expect('body>.popupTemplate>#template', 'to be rendered');
+                    expect('body>.popupTemplate>#template', 'to be visible');
+                });
+            });
+            describe('renderOnInit', function () {
+                beforeEach(function () {
+                    $('<div data-bind="popupTemplate: config">Popup</div>').appendTo($testElement);
+                    var bindingContext = {
+                        config: {
+                            template: 'popupTemplate',
+                            renderOnInit: true,
+                            openState: ko.observable(true)
+                        }
+                    };
+                    ko.applyBindings(bindingContext, $testElement[0]);
+                });
+
+                it('should be visible if openState is true', function () {
+                    expect('body>.popupTemplate>#template', 'to be rendered');
+                    expect('body>.popupTemplate>#template', 'to be visible');
+                });
+            });
+        });
+
         describe('renderOnInit', function () {
             beforeEach(function () {
                 $('<div id="anchor" data-bind="popupTemplate: { template: \'popupTemplate\', renderOnInit: true } ">Popup1</div>').appendTo($testElement);

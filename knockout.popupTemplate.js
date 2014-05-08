@@ -215,7 +215,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 });
             }
 
-            subscriptions.push(config.openState.subscribe(function (newValue) {
+            function render(newValue) {
                 if (newValue) {
                     // if the popup is being opened
                     config.beforeOpen();
@@ -229,7 +229,14 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                     if (config.outsideHandler) removeCloseHandler();
                     config.afterClose();
                 }
-            }));
+            }
+
+            subscriptions.push(config.openState.subscribe(render));
+
+            // initial render if the popup is supposed to start open
+            if (config.openState()) {
+                render(true);
+            }
 
             ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
                 subscriptions.forEach(function (item) {
