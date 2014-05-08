@@ -22,8 +22,19 @@ describe('popupTemplate', function () {
     });
 
     function click(selector) {
-        var event = $.Event('mousedown', { which: 1 });
-        $(selector).trigger(event);
+        var event = document.createEvent('MouseEvent');
+        event.initMouseEvent(
+            // See https://developer.mozilla.org/en-US/docs/Web/API/event.initMouseEvent
+            "mousedown", // type
+            true, // can bubble
+            true, // can cancelable
+            window, null, 0, 0, 0, 0, false, false, false, false,
+            0, // Button: 0 = Left click, 1 = Middle click, 2 = Right click
+            null
+        );
+        // Below doesn't work in PhantomJS
+        // var event = new MouseEvent('mousedown', { which: 1 });
+        $(selector)[0].dispatchEvent(event);
     }
 
 
@@ -80,6 +91,17 @@ describe('popupTemplate', function () {
             expect('body>.popupTemplate>#template', 'to be visible');
             click('#anchor2'); // Show popup
             expect('body>.popupTemplate>#template3', 'to be visible');
+            expect('body>.popupTemplate>#template', 'not to be visible');
+        });
+
+        it('closes when a click hits a button that stops propagation', function () {
+            $('<button id="someButton">A button</button>').appendTo($testElement);
+            $('#someButton').on('mousedown', function (e) {
+                e.stopPropagation();
+            });
+            click('#anchor1'); // Show popup
+            expect('body>.popupTemplate>#template', 'to be visible');
+            click('#someButton'); // Show popup
             expect('body>.popupTemplate>#template', 'not to be visible');
         });
 

@@ -146,18 +146,38 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             subscriptions.push(config.positioning.vertical.subscribe(repositionPopup));
 
             function closePopupHandler(event) {
-                if (event.which === 1 && !$element.is(event.target) && !$element.has(event.target).length &&
-                    !$popupHolder.is(event.target) && !$popupHolder.has(event.target).length) {
-                    config.openState(false);
+                if (event.which === 1 && config.openState()) {
+                    var target = event.target || document.elementFromPoint(event.pageX || event.clientX, event.pageY || event.clientY);
+                    var isPopup = $popupHolder.is(target) || $popupHolder.has(target).length > 0;
+                    var isAnchor = $element.is(target) || $element.has(target).length > 0;
+                    if (!isPopup && !isAnchor) {
+                        config.openState(false);
+                    }
                 }
             }
-            function addCloseHandler() {
-                $('iframe').contents().on('mousedown.popupTemplate', closePopupHandler);
-                $(document).on('mousedown.popupTemplate', closePopupHandler);
+
+            function eachIFrameContents(callback) {
+                $('iframe').each(function (index, iframe) {
+                    var src = iframe.src;
+                    var origin = window.location.origin || location.protocol + '//' + location.host;
+                    if (!src || src.indexOf(origin) === 0) {
+                        $(iframe).contents().each(callback);
+                    }
+                });
             }
+
+            function addCloseHandler() {
+                eachIFrameContents(function (index, doc) {
+                    doc.addEventListener('mousedown', closePopupHandler, true);
+                });
+                document.addEventListener('mousedown', closePopupHandler, true);
+            }
+
             function removeCloseHandler() {
-                $('iframe').contents().off('mousedown.popupTemplate', closePopupHandler);
-                $(document).off('mousedown.popupTemplate', closePopupHandler);
+                eachIFrameContents(function (index, doc) {
+                    doc.removeEventListener('mousedown', closePopupHandler, true);
+                });
+                document.removeEventListener('mousedown', closePopupHandler, true);
             }
 
             function hidePopup() {
