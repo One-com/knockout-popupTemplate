@@ -51,6 +51,8 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                     template: config
                 };
             }
+            config.renderOnInit = !!config.renderOnInit;
+            config.renderOnOpen = !config.renderOnInit;
             config.data = config.data || bindingContext.$data;
             config.beforeOpen = config.beforeOpen || function () {};
             config.afterOpen = config.afterOpen || function () {};

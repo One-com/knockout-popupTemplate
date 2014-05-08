@@ -46,52 +46,54 @@ describe('popupTemplate', function () {
             ko.applyBindings(bindingContext, $testElement[0]);
         });
 
-        it('renders a template in the body tag', function () {
-            expect('body>.popupTemplate>#template', 'to be rendered');
-        });
-
-        it('hides the popup element at first', function () {
-            expect('body>.popupTemplate>#template', 'not to be visible');
+        it('does not render a template in the body tag initially', function () {
+            expect('body>.popupTemplate>#template', 'not to be rendered');
         });
 
         it('shows the popup when element is clicked', function () {
             click('#anchor1');
+            expect('body>.popupTemplate>#template', 'to be rendered');
             expect('body>.popupTemplate>#template', 'to be visible');
         });
 
-        it('hides the popup again on click outside popup', function () {
+        it('removes the popup again on click outside popup', function () {
             click('#anchor1'); // Show popup
+            expect('body>.popupTemplate>#template', 'to be rendered');
+            expect('body>.popupTemplate>#template', 'to be visible');
             click('body'); // Click outside
-            expect('body>.popupTemplate>#template', 'not to be visible');
+            expect('body>.popupTemplate>#template', 'not to be rendered');
         });
-        it('hides the popup again on click outside popup', function () {
+        it('removes the popup again on anchor click', function () {
             click('#anchor1'); // Show popup
+            expect('body>.popupTemplate>#template', 'to be rendered');
+            expect('body>.popupTemplate>#template', 'to be visible');
             click('#anchor1'); // Click inside
-            expect('body>.popupTemplate>#template', 'not to be visible');
+            expect('body>.popupTemplate>#template', 'not to be rendered');
         });
 
-        it('works even with many open/closes', function () {
+        it('works even with many open/closes @slow', function () {
             for (var i = 0; i < 20; i += 1) {
                 click('#anchor1'); // Show popup
+                expect('body>.popupTemplate>#template', 'to be rendered');
                 expect('body>.popupTemplate>#template', 'to be visible');
                 click('body'); // Click outside
-                expect('body>.popupTemplate>#template', 'not to be visible');
+                expect('body>.popupTemplate>#template', 'not to be rendered');
             }
         });
 
         it('does not hide on click within the popup', function () {
             click('#anchor1'); // Show popup
+            expect('body>.popupTemplate>#template', 'to be rendered');
             click('body>.popupTemplate>#template'); // Click inside popup
-            expect('body>.popupTemplate>#template', 'to be visible');
+            expect('body>.popupTemplate>#template', 'to be rendered');
         });
 
         it('closes when a click hits another popup anchor', function () {
-            expect('body>.popupTemplate>#template3', 'to be rendered');
             click('#anchor1'); // Show popup
-            expect('body>.popupTemplate>#template', 'to be visible');
+            expect('body>.popupTemplate>#template', 'to be rendered');
             click('#anchor2'); // Show popup
-            expect('body>.popupTemplate>#template3', 'to be visible');
-            expect('body>.popupTemplate>#template', 'not to be visible');
+            expect('body>.popupTemplate>#template', 'not to be rendered');
+            expect('body>.popupTemplate>#template3', 'to be rendered');
         });
 
         it('closes when a click hits a button that stops propagation', function () {
@@ -100,9 +102,9 @@ describe('popupTemplate', function () {
                 e.stopPropagation();
             });
             click('#anchor1'); // Show popup
-            expect('body>.popupTemplate>#template', 'to be visible');
+            expect('body>.popupTemplate>#template', 'to be rendered');
             click('#someButton'); // Show popup
-            expect('body>.popupTemplate>#template', 'not to be visible');
+            expect('body>.popupTemplate>#template', 'not to be rendered');
         });
 
         it('closes when clicked inside an iframe', function () {
@@ -111,9 +113,9 @@ describe('popupTemplate', function () {
             var $iframeBody = $iframe.contents().find('body');
             $iframeBody.append('<div id="clicktarget">');
             click('#anchor1'); // Show popup
-            expect('body>.popupTemplate>#template', 'to be visible');
+            expect('body>.popupTemplate>#template', 'to be rendered');
             click($iframeBody.find('#clicktarget')); // Click in iframe
-            expect('body>.popupTemplate>#template', 'not to be visible');
+            expect('body>.popupTemplate>#template', 'not to be rendered');
         });
 
         it("... even when it's the second iframe", function () {
@@ -124,9 +126,9 @@ describe('popupTemplate', function () {
             var $iframeBody = $iframe.contents().find('body');
             $iframeBody.append('<div id="clicktarget">');
             click('#anchor1'); // Show popup
-            expect('body>.popupTemplate>#template', 'to be visible');
+            expect('body>.popupTemplate>#template', 'to be rendered');
             click($iframeBody.find('#clicktarget')); // Click in iframe
-            expect('body>.popupTemplate>#template', 'not to be visible');
+            expect('body>.popupTemplate>#template', 'not to be rendered');
         });
 
         it('works even with many open/closes @slow', function () {
@@ -136,9 +138,9 @@ describe('popupTemplate', function () {
             $iframeBody.append('<div id="clicktarget">');
             for (var i = 0; i < 20; i += 1) {
                 click('#anchor1'); // Show popup
-                expect('body>.popupTemplate>#template', 'to be visible');
+                expect('body>.popupTemplate>#template', 'to be rendered');
                 click($iframeBody.find('#clicktarget')); // Click in iframe
-                expect('body>.popupTemplate>#template', 'not to be visible');
+                expect('body>.popupTemplate>#template', 'not to be rendered');
             }
         });
 
@@ -151,7 +153,6 @@ describe('popupTemplate', function () {
             expect(popupPosition.top, 'to be', elementPosition.top + $anchor.height());
         });
     });
-
     describe('configurations', function () {
         describe('config objects and data models', function () {
             beforeEach(function () {
@@ -159,6 +160,7 @@ describe('popupTemplate', function () {
                 var bindingContext = {
                     config: {
                         template: 'popupTemplate2',
+                        renderOnInit: true,
                         data: {
                             testText: 'This is a test'
                         }
@@ -176,43 +178,32 @@ describe('popupTemplate', function () {
             });
         });
 
-        describe('render on open', function () {
+        describe('renderOnInit', function () {
             beforeEach(function () {
-                $('<div data-bind="popupTemplate: config">Popup</div>').appendTo($testElement);
-                var bindingContext = {
-                    config: {
-                        template: 'popupTemplate2',
-                        data: {
-                            testText: 'This is a test'
-                        },
-                        renderOnOpen: true
-                    }
-                };
+                $('<div id="anchor" data-bind="popupTemplate: { template: \'popupTemplate\', renderOnInit: true } ">Popup1</div>').appendTo($testElement);
+                var bindingContext = {};
                 ko.applyBindings(bindingContext, $testElement[0]);
             });
 
-            it('does not render the popup before opening', function () {
-                expect('body>.popupTemplate>#template', 'not to be rendered');
-            });
-
-            it('renders and shows the popup when element is clicked', function () {
-                click('#test>div');
+            it('render a template in the body tag initially', function () {
                 expect('body>.popupTemplate>#template', 'to be rendered');
             });
 
-            it('removes the popup when element is closed again', function () {
-                click('#test>div'); // Show popup
-                click('body'); // Click outside
-                expect('body>.popupTemplate>#template', 'not to be rendered');
+            it('hides the popup element at first', function () {
+                expect('body>.popupTemplate>#template', 'to be rendered');
+                expect('body>.popupTemplate>#template', 'not to be visible');
             });
 
-            it('works even with many open/closes', function () {
-                for (var i = 0; i < 20; i += 1) {
-                    click('#test>div'); // Show popup
-                    expect('body>.popupTemplate>#template', 'to be rendered');
-                    click('body'); // Click outside
-                    expect('body>.popupTemplate>#template', 'not to be rendered');
-                }
+            it('shows the popup when element is clicked', function () {
+                click('#anchor');
+                expect('body>.popupTemplate>#template', 'to be visible');
+            });
+
+            it('hides the popup again on click outside popup', function () {
+                click('#anchor'); // Show popup
+                click('body'); // Click outside
+                expect('body>.popupTemplate>#template', 'to be rendered');
+                expect('body>.popupTemplate>#template', 'not to be visible');
             });
         });
 
@@ -242,14 +233,14 @@ describe('popupTemplate', function () {
             });
             it('closes the popup if config.openState is set to false', function () {
                 click('#test>div'); // Show popup
-                expect('body>.popupTemplate>#template', 'to be visible');
+                expect('body>.popupTemplate>#template', 'to be rendered');
                 popupState(false);
-                expect('body>.popupTemplate>#template', 'not to be visible');
+                expect('body>.popupTemplate>#template', 'not to be rendered');
             });
             it('opens the popup if config.openState is set to true', function () {
-                expect('body>.popupTemplate>#template', 'not to be visible');
+                expect('body>.popupTemplate>#template', 'not to be rendered');
                 popupState(true);
-                expect('body>.popupTemplate>#template', 'to be visible');
+                expect('body>.popupTemplate>#template', 'to be rendered');
             });
         });
 
@@ -308,7 +299,7 @@ describe('popupTemplate', function () {
             it('should not open on click', function () {
                 click('#test>div');
                 expect(openState(), 'to be false');
-                expect('body>.popupTemplate>#template', 'not to be visible');
+                expect('body>.popupTemplate>#template', 'not to be rendered');
             });
         });
 
@@ -388,8 +379,8 @@ describe('popupTemplate', function () {
                 };
                 ko.applyBindings({ config: config }, $testElement[0]);
                 var $anchor = $('#anchor');
-                var $popup = $('body>.popupTemplate');
                 click('#anchor');
+                var $popup = $('body>.popupTemplate');
                 var popupPosition = $popup.offset();
                 var elementPosition = $anchor.offset();
                 expect(popupPosition.left, 'to be', elementPosition.left - $popup.outerWidth());
@@ -434,8 +425,8 @@ describe('popupTemplate', function () {
                 };
                 ko.applyBindings({ config: config }, $testElement[0]);
                 var $anchor = $('#anchor');
-                var $popup = $('body>.popupTemplate');
                 click('#anchor');
+                var $popup = $('body>.popupTemplate');
                 var popupPosition = $popup.offset();
                 var elementPosition = $anchor.offset();
                 expect(popupPosition.left + $popup.width(), 'to be', elementPosition.left + $anchor.outerWidth());
@@ -450,8 +441,8 @@ describe('popupTemplate', function () {
                 };
                 ko.applyBindings({ config: config }, $testElement[0]);
                 var $anchor = $('#anchor');
-                var $popup = $('body>.popupTemplate');
                 click('#anchor');
+                var $popup = $('body>.popupTemplate');
                 var popupPosition = $popup.offset();
                 var elementPosition = $anchor.offset();
                 expect(popupPosition.left, 'to be', elementPosition.left + $anchor.outerWidth());
@@ -466,8 +457,8 @@ describe('popupTemplate', function () {
                 };
                 ko.applyBindings({ config: config }, $testElement[0]);
                 var $anchor = $('#anchor');
-                var $popup = $('body>.popupTemplate');
                 click('#anchor');
+                var $popup = $('body>.popupTemplate');
                 var popupPosition = $popup.offset();
                 var elementPosition = $anchor.offset();
                 expect(popupPosition.top, 'to be', elementPosition.top - $popup.height());
@@ -482,8 +473,8 @@ describe('popupTemplate', function () {
                 };
                 ko.applyBindings({ config: config }, $testElement[0]);
                 var $anchor = $('#anchor');
-                var $popup = $('body>.popupTemplate');
                 click('#anchor');
+                var $popup = $('body>.popupTemplate');
                 var popupPosition = $popup.offset();
                 var elementPosition = $anchor.offset();
                 expect(popupPosition.top, 'to be', elementPosition.top);
@@ -499,8 +490,8 @@ describe('popupTemplate', function () {
                 ko.applyBindings({ config: config }, $testElement[0]);
                 config.positioning.vertical('middle');
                 var $anchor = $('#anchor');
-                var $popup = $('body>.popupTemplate');
                 click('#anchor');
+                var $popup = $('body>.popupTemplate');
                 expect($popup.offset().top + Math.round($popup.height() / 2), 'to be', $anchor.offset().top + Math.round($anchor.outerHeight() / 2));
             });
 
@@ -513,8 +504,8 @@ describe('popupTemplate', function () {
                 };
                 ko.applyBindings({ config: config }, $testElement[0]);
                 var $anchor = $('#anchor');
-                var $popup = $('body>.popupTemplate');
                 click('#anchor');
+                var $popup = $('body>.popupTemplate');
                 var popupPosition = $popup.offset();
                 var elementPosition = $anchor.offset();
                 expect(popupPosition.top + $popup.height(), 'to be', elementPosition.top + $anchor.outerHeight());
@@ -546,8 +537,8 @@ describe('popupTemplate', function () {
                 };
                 ko.applyBindings({ config: config }, $testElement[0]);
                 var $anchor = $('#anchor');
-                var $popup = $('body>.popupTemplate');
                 click('#anchor');
+                var $popup = $('body>.popupTemplate');
                 expect($popup.offset().left, 'to be', $anchor.offset().left);
                 expect($popup.offset().top, 'to be', $anchor.offset().top + $anchor.outerHeight());
                 config.positioning.horizontal('outside-left');
