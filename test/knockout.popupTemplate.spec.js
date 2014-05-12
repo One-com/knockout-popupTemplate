@@ -605,5 +605,80 @@ describe('popupTemplate', function () {
                 expect($popup.hasClass('aTestClassName'), 'to be ok');
             });
         });
+        describe('Disposal callback', function () {
+            var config, element;
+            var applyBindings = function () {
+                ko.applyBindings({ config: config }, $testElement[0]);
+            };
+
+            beforeEach(function () {
+                config = {
+                    template: 'popupTemplate',
+                    openState: ko.observable(false)
+                };
+                $('<div id="anchor" data-bind="popupTemplate: config" style="margin-left: 300px; width: 200px; height: 50px; padding: 5px; border: 1px solid black;">Popup</div>').appendTo($testElement);
+                element = $('#anchor', $testElement)[0];
+            });
+
+            afterEach(function () {
+                ko.cleanNode($testElement[0]);
+                $testElement.empty();
+            });
+
+            it('Calls the disposal callback if given, when knockout tears out the element.', function () {
+                config.disposalCallback = sinon.spy();
+                applyBindings();
+                config.openState(true); // open popup
+                ko.removeNode(element); // tear anchor out
+                expect(config.disposalCallback, 'was called with', $('body>.popupTemplate')[0]);
+                $('body>.popupTemplate').remove(); // Clean up the template
+            });
+
+            it('Calls the disposal callback if given, when popup is closed.', function () {
+                config.disposalCallback = sinon.spy();
+                applyBindings();
+                config.openState(true); // open popup
+                config.openState(false); // close popup
+                expect(config.disposalCallback, 'was called with', $('body>.popupTemplate')[0]);
+                $('body>.popupTemplate').remove(); // Clean up the template
+            });
+
+            it('does not remove the popupTemplate automaticly', function () {
+                config.disposalCallback = sinon.stub();
+                applyBindings();
+                config.openState(true);
+                ko.removeNode(element);
+                expect('body>.popupTemplate', 'to be rendered');
+                $('body>.popupTemplate').remove(); // Clean up the template
+            });
+
+            describe('with faked timers', function () {
+                var clock;
+
+                beforeEach(function () {
+                    clock = sinon.useFakeTimers();
+                });
+
+                afterEach(function () {
+                    clock.restore();
+                });
+
+                it('animation test case', function () {
+                    config.disposalCallback = sinon.spy(function (popup) {
+                        setTimeout(function () {
+                            $(popup).remove();
+                        }, 100);
+                    });
+                    applyBindings();
+                    config.openState(true);
+                    expect('body>.popupTemplate', 'to be rendered');
+                    config.openState(false);
+                    expect(config.disposalCallback, 'was called');
+                    expect('body>.popupTemplate', 'to be rendered');
+                    clock.tick(101);
+                    expect('body>.popupTemplate', 'not to be rendered');
+                });
+            });
+        });
     });
 });

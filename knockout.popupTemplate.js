@@ -63,6 +63,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             config.positioning = config.positioning || {};
             config.anchorHandler = config.anchorHandler === false ? false : true;
             config.outsideHandler = config.outsideHandler === false ? false : true;
+            config.disposalCallback = config.disposalCallback || null;
             if (HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal) !== -1) {
                 config.positioning.horizontal = ko.observable(config.positioning.horizontal);
             } else if (ko.isObservable(config.positioning.horizontal) && HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal()) !== -1) {
@@ -100,7 +101,11 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             }
 
             function removePopup(done) {
-                $popupHolder.remove();
+                if (config.disposalCallback) {
+                    config.disposalCallback($popupHolder[0]);
+                } else {
+                    $popupHolder.remove();
+                }
                 if (typeof done === 'function') { done(); }
             }
 
