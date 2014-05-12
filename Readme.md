@@ -23,6 +23,7 @@ This will give the default behavior, outlined above. Alternatively, the binding 
 - `anchorHandler`: If false, clicking the anchor does not open or close the popup.
 - `outsideHandler`: If false, clicking outside the popup will not close it.
 - `positioning`: An object containing positioning information (see below).
+- `className`: A string containing a class name to put in the class attribute of the popupTemplate container.
 
 ```html
 <div data-bind="popupTemplate: { template: 'templateName' }">Anchor text</div>

@@ -584,5 +584,26 @@ describe('popupTemplate', function () {
                 expect($popup.offset().top + $popup.height(), 'to be', $anchor.offset().top + $anchor.outerHeight());
             });
         });
+        describe('className', function () {
+            var config;
+            var applyBindings = function () {
+                ko.applyBindings({ config: config }, $testElement[0]);
+            };
+            beforeEach(function () {
+                config = {
+                    template: 'popupTemplate',
+                    openState: ko.observable(false)
+                };
+                $('<div id="anchor" data-bind="popupTemplate: config" style="margin-left: 300px; width: 200px; height: 50px; padding: 5px; border: 1px solid black;">Popup</div>').appendTo($testElement);
+            });
+
+            it('gives the popup a class name if asked to', function () {
+                config.className = 'aTestClassName';
+                applyBindings();
+                config.openState(true);
+                var $popup = $('body>.popupTemplate');
+                expect($popup.hasClass('aTestClassName'), 'to be ok');
+            });
+        });
     });
 });

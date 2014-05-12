@@ -53,6 +53,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             }
             config.renderOnInit = !!config.renderOnInit;
             config.renderOnOpen = !config.renderOnInit;
+            config.className = config.className || '';
             config.data = config.data || bindingContext.$data;
             config.beforeOpen = config.beforeOpen || function () {};
             config.afterOpen = config.afterOpen || function () {};
@@ -84,7 +85,11 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             var $popupHolder;
 
             function renderPopup(done) {
-                $popupHolder = $('<div class="popupTemplate"></div>');
+                var popupClassName = 'popupTemplate';
+                if (config.className) {
+                    popupClassName += ' ' + config.className;
+                }
+                $popupHolder = $('<div class="' + popupClassName + '"></div>');
                 $popupHolder.appendTo($('body'));
                 $popupHolder.css('position', 'absolute');
                 var innerBindingContext = ('data' in config) ?
