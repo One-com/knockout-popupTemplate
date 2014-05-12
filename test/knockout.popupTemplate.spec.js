@@ -281,6 +281,34 @@ describe('popupTemplate', function () {
             });
         });
 
+        describe('state observable (made from nonobservable input value)', function () {
+            var config;
+            var applyBindings = function () {
+                ko.applyBindings({ config: config }, $testElement[0]);
+            };
+            beforeEach(function () {
+                $('<div data-bind="popupTemplate: config">Popup</div>').appendTo($testElement);
+                config = {
+                    template: 'popupTemplate'
+                };
+            });
+            it('render when passed a boolean true value', function () {
+                config.openState = true;
+                applyBindings();
+                expect('body>.popupTemplate>#template', 'to be rendered');
+            });
+            it('do not render when passed a boolean false value', function () {
+                config.openState = false;
+                applyBindings();
+                expect('body>.popupTemplate>#template', 'not to be rendered');
+            });
+            it('do not render when passed a non-boolean and a non-observable value', function () {
+                config.openState = 'a really stupid value for a (observable) boolean flag';
+                applyBindings();
+                expect('body>.popupTemplate>#template', 'not to be rendered');
+            });
+        });
+
         describe('handlers', function () {
             var beforeOpen, afterOpen, beforeClose, afterClose, popupState;
             beforeEach(function () {

@@ -51,6 +51,15 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                     template: config
                 };
             }
+
+            if (!ko.isObservable(config.openState)) {
+                if (typeof config.openState === 'boolean') {
+                    config.openState = ko.observable(config.openState);
+                } else {
+                    config.openState = ko.observable(false);
+                }
+            }
+
             config.renderOnInit = !!config.renderOnInit;
             config.renderOnOpen = !config.renderOnInit;
             config.className = config.className || '';
@@ -59,7 +68,6 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             config.afterOpen = config.afterOpen || function () {};
             config.beforeClose = config.beforeClose || function () {};
             config.afterClose = config.afterClose || function () {};
-            config.openState = ko.isObservable(config.openState) ? config.openState : ko.observable(false);
             config.positioning = config.positioning || {};
             config.anchorHandler = config.anchorHandler === false ? false : true;
             config.outsideHandler = config.outsideHandler === false ? false : true;
