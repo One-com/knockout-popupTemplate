@@ -211,21 +211,21 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
     Popup.prototype.open = function (done) {
         var that = this;
-        if (this.options.renderOnOpen) {
+        if (this.options.renderOnInit) {
+            this.show(done);
+        } else {
             this.render(function () {
                 that.reposition();
                 callMeMaybe(done);
             });
-        } else {
-            this.show(done);
         }
     };
 
     Popup.prototype.close = function (done) {
-        if (this.options.renderOnOpen) {
-            this.remove(done);
-        } else {
+        if (this.options.renderOnInit) {
             this.hide(done);
+        } else {
+            this.remove(done);
         }
     };
 
@@ -247,7 +247,6 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             }
 
             config.renderOnInit = !!config.renderOnInit;
-            config.renderOnOpen = !config.renderOnInit;
             config.className = config.className || '';
             config.data = config.data || bindingContext.$data;
             config.beforeOpen = config.beforeOpen || function () {};
@@ -298,7 +297,6 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 openState: config.openState,
                 positioning: config.positioning,
                 beforeOpen: config.beforeOpen,
-                renderOnOpen: config.renderOnOpen,
                 renderOnInit: config.renderOnInit,
                 afterOpen: config.afterOpen,
                 beforeClose: config.beforeClose,
