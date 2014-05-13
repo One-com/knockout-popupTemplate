@@ -43,6 +43,11 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     var HORIZONTAL_POSITIONS = ['outside-left', 'inside-left', 'middle', 'inside-right', 'outside-right'];
     var VERTICAL_POSITIONS = ['outside-top', 'inside-top', 'middle', 'inside-bottom', 'outside-bottom'];
 
+    function callMeMaybe(callback) {
+        if (typeof callback === 'function') { callback(); }
+    }
+
+
     function Anchor(options) {
         this.element = options.element;
         this.$element = $(this.element);
@@ -100,7 +105,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         } else {
             this.$popupHolder.remove();
         }
-        if (typeof done === 'function') { done(); }
+        callMeMaybe(done);
     };
 
     Popup.prototype.reposition = function () {
@@ -149,13 +154,13 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
     Popup.prototype.hide = function (done) {
         this.$popupHolder.css('visibility', 'hidden');
-        if (typeof done === 'function') { done(); }
+        callMeMaybe(done);
     };
 
     Popup.prototype.show = function (done) {
         this.$popupHolder.css('visibility', 'visible');
         this.reposition();
-        done();
+        callMeMaybe(done);
     };
 
 
@@ -270,7 +275,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 opener = function (done) {
                     popup.render(function () {
                         popup.reposition();
-                        done();
+                        callMeMaybe(done);
                     });
                 };
                 closer = popup.remove.bind(popup);
