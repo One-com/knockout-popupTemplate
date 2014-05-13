@@ -61,6 +61,42 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         });
     };
 
+    function Popup(anchor, options) {
+        this.anchor = anchor;
+        this.options = options;
+
+        this.$popupHolder = this.createElementContainer();
+    }
+
+    Popup.prototype.createElementContainer = function () {
+        var $popupHolder;
+        var popupClassName = 'popupTemplate';
+        if (this.options.className) {
+            popupClassName += ' ' + this.options.className;
+        }
+        $popupHolder = $('<div class="' + popupClassName + '"></div>');
+        $popupHolder.css('position', 'absolute');
+        return $popupHolder;
+    };
+
+    Popup.prototype.render = function (done) {
+        this.$popupHolder.appendTo($('body'));
+        var innerBindingContext = ('data' in this.options) ?
+            this.options.bindingContext.createChildContext(ko.utils.unwrapObservable(this.options.data)) :  // Given an explicit 'data' value, we create a child binding context for it
+            this.options.bindingContext;                                               // Given no explicit 'data' value, we retain the same binding context
+        ko.renderTemplate(this.options.template, innerBindingContext, { afterRender: done }, this.$popupHolder[0]);
+        ko.utils.domNodeDisposal.addDisposeCallback(this.anchor.element, this.remove.bind(this));
+    };
+
+    Popup.prototype.remove = function (done) {
+        if (this.options.disposalCallback) {
+            this.options.disposalCallback(this.$popupHolder[0]);
+        } else {
+            this.$popupHolder.remove();
+        }
+        if (typeof done === 'function') { done(); }
+    };
+
     ko.bindingHandlers.popupTemplate = {
         init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
             var config = valueAccessor();
@@ -109,7 +145,6 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
             var subscriptions = [];
             var $element = $(element);
-            var $popupHolder;
 
             // REFACTORED STUFF START
             var anchor = new Anchor({
@@ -120,32 +155,17 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             if (config.anchorHandler) {
                 anchor.setupHandler();
             }
+
+            var popup = new Popup(anchor, {
+                className: config.className,
+                data: config.data,
+                bindingContext: bindingContext,
+                template: config.template,
+                disposalCallback: config.disposalCallback
+            });
             // REFACTORED STUFF END
 
-            function renderPopup(done) {
-                var popupClassName = 'popupTemplate';
-                if (config.className) {
-                    popupClassName += ' ' + config.className;
-                }
-                $popupHolder = $('<div class="' + popupClassName + '"></div>');
-                $popupHolder.appendTo($('body'));
-                $popupHolder.css('position', 'absolute');
-                var innerBindingContext = ('data' in config) ?
-                    bindingContext.createChildContext(ko.utils.unwrapObservable(config.data, config.as)) :  // Given an explicit 'data' value, we create a child binding context for it
-                    bindingContext;                                               // Given no explicit 'data' value, we retain the same binding context
-                ko.renderTemplate(config.template, innerBindingContext, { afterRender: done }, $popupHolder[0]);
-                ko.utils.domNodeDisposal.addDisposeCallback(element, removePopup);
-            }
-
-            function removePopup(done) {
-                if (config.disposalCallback) {
-                    config.disposalCallback($popupHolder[0]);
-                } else {
-                    $popupHolder.remove();
-                }
-                if (typeof done === 'function') { done(); }
-            }
-
+            var $popupHolder = popup.$popupHolder;
 
             function repositionPopup() {
                 var position = $element.offset();
@@ -242,14 +262,14 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             var opener, closer;
             if (config.renderOnOpen) {
                 opener = function (done) {
-                    renderPopup(function () {
+                    popup.render(function () {
                         repositionPopup();
                         done();
                     });
                 };
-                closer = removePopup;
+                closer = popup.remove.bind(popup);
             } else {
-                renderPopup();
+                popup.render();
                 opener = showPopup;
                 closer = hidePopup;
                 closer();
