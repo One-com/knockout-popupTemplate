@@ -215,12 +215,28 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
     ko.bindingHandlers.popupTemplate = {
         init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+            var defaultConfiguration = {
+                renderOnInit: false,
+                className: '',
+                beforeOpen: function () {},
+                afterOpen: function () {},
+                beforeClose: function () {},
+                afterClose: function () {},
+                positioning: {},
+                anchorHandler: true,
+                outsideHandler: true,
+                disposalCallBack: null,
+                data: bindingContext.$data
+            };
+
             var config = valueAccessor();
             if (typeof config === 'string') {
                 config = {
                     template: config
                 };
             }
+
+            config = ko.utils.extend(defaultConfiguration, config);
 
             if (!ko.isObservable(config.openState)) {
                 if (typeof config.openState === 'boolean') {
@@ -230,17 +246,6 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 }
             }
 
-            config.renderOnInit = !!config.renderOnInit;
-            config.className = config.className || '';
-            config.data = config.data || bindingContext.$data;
-            config.beforeOpen = config.beforeOpen || function () {};
-            config.afterOpen = config.afterOpen || function () {};
-            config.beforeClose = config.beforeClose || function () {};
-            config.afterClose = config.afterClose || function () {};
-            config.positioning = config.positioning || {};
-            config.anchorHandler = config.anchorHandler === false ? false : true;
-            config.outsideHandler = config.outsideHandler === false ? false : true;
-            config.disposalCallback = config.disposalCallback || null;
             if (HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal) !== -1) {
                 config.positioning.horizontal = ko.observable(config.positioning.horizontal);
             } else if (ko.isObservable(config.positioning.horizontal) && HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal()) !== -1) {
