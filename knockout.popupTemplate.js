@@ -65,6 +65,8 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         this.anchor = anchor;
         this.options = options;
 
+        this.subscriptions = [];
+
         this.$popupHolder = this.createElementContainer();
     }
 
@@ -76,6 +78,10 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         }
         $popupHolder = $('<div class="' + popupClassName + '"></div>');
         $popupHolder.css('position', 'absolute');
+
+        this.subscriptions.push(this.options.positioning.horizontal.subscribe(this.reposition.bind(this)));
+        this.subscriptions.push(this.options.positioning.vertical.subscribe(this.reposition.bind(this)));
+
         return $popupHolder;
     };
 
@@ -96,6 +102,51 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         }
         if (typeof done === 'function') { done(); }
     };
+
+    Popup.prototype.reposition = function () {
+        if (!this.$popupHolder) { return; }
+        var position = this.anchor.$element.offset();
+        switch (this.options.positioning.horizontal()) {
+        case 'outside-left':
+            position.left -= this.$popupHolder.outerWidth();
+            break;
+        case 'inside-left':
+            // No change in left coord.
+            break;
+        case 'middle':
+            position.left += Math.round(this.anchor.$element.outerWidth() / 2);
+            position.left -= Math.round(this.$popupHolder.width() / 2);
+            break;
+        case 'inside-right':
+            position.left += this.anchor.$element.outerWidth();
+            position.left -= this.$popupHolder.width();
+            break;
+        case 'outside-right':
+            position.left += this.anchor.$element.outerWidth();
+            break;
+        }
+        switch (this.options.positioning.vertical()) {
+        case 'outside-top':
+            position.top -= this.$popupHolder.height();
+            break;
+        case 'inside-top':
+            // No change in top coord
+            break;
+        case 'middle':
+            position.top += Math.round(this.anchor.$element.outerHeight() / 2);
+            position.top -= Math.round(this.$popupHolder.height() / 2);
+            break;
+        case 'inside-bottom':
+            position.top += this.anchor.$element.outerHeight();
+            position.top -= this.$popupHolder.height();
+            break;
+        case 'outside-bottom':
+            position.top += this.anchor.$element.outerHeight();
+            break;
+        }
+        this.$popupHolder.offset(position);
+    };
+
 
     ko.bindingHandlers.popupTemplate = {
         init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
@@ -161,57 +212,12 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 data: config.data,
                 bindingContext: bindingContext,
                 template: config.template,
-                disposalCallback: config.disposalCallback
+                disposalCallback: config.disposalCallback,
+                positioning: config.positioning
             });
             // REFACTORED STUFF END
 
             var $popupHolder = popup.$popupHolder;
-
-            function repositionPopup() {
-                var position = $element.offset();
-                switch (config.positioning.horizontal()) {
-                case 'outside-left':
-                    position.left -= $popupHolder.outerWidth();
-                    break;
-                case 'inside-left':
-                    // No change in left coord.
-                    break;
-                case 'middle':
-                    position.left += Math.round($element.outerWidth() / 2);
-                    position.left -= Math.round($popupHolder.width() / 2);
-                    break;
-                case 'inside-right':
-                    position.left += $element.outerWidth();
-                    position.left -= $popupHolder.width();
-                    break;
-                case 'outside-right':
-                    position.left += $element.outerWidth();
-                    break;
-                }
-                switch (config.positioning.vertical()) {
-                case 'outside-top':
-                    position.top -= $popupHolder.height();
-                    break;
-                case 'inside-top':
-                    // No change in top coord
-                    break;
-                case 'middle':
-                    position.top += Math.round($element.outerHeight() / 2);
-                    position.top -= Math.round($popupHolder.height() / 2);
-                    break;
-                case 'inside-bottom':
-                    position.top += $element.outerHeight();
-                    position.top -= $popupHolder.height();
-                    break;
-                case 'outside-bottom':
-                    position.top += $element.outerHeight();
-                    break;
-                }
-                $popupHolder.offset(position);
-            }
-
-            subscriptions.push(config.positioning.horizontal.subscribe(repositionPopup));
-            subscriptions.push(config.positioning.vertical.subscribe(repositionPopup));
 
             function closePopupHandler(event) {
                 if (event.which === 1 && config.openState()) {
@@ -255,7 +261,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
             function showPopup(done) {
                 $popupHolder.css('visibility', 'visible');
-                repositionPopup();
+                popup.reposition();
                 done();
             }
 
@@ -263,7 +269,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             if (config.renderOnOpen) {
                 opener = function (done) {
                     popup.render(function () {
-                        repositionPopup();
+                        popup.reposition();
                         done();
                     });
                 };
