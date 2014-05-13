@@ -47,6 +47,12 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         if (typeof callback === 'function') { callback(); }
     }
 
+    function beforeCallingCall(origFn, fn) {
+        return function () {
+            callMeMaybe(origFn);
+            callMeMaybe(fn);
+        };
+    }
 
     function Anchor(options) {
         this.element = options.element;
@@ -74,12 +80,42 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
         this.$popupHolder = this.createElementContainer();
 
+        this.subscriptions.push(this.options.openState.subscribe(this.observe.bind(this)));
+
+        if (this.options.renderOnInit) {
+            this.render();
+            this.reposition();
+            this.close();
+        }
+
+        // initial render if the popup is supposed to start open
+        if (this.options.openState()) {
+            this.observe(true);
+        }
+
         ko.utils.domNodeDisposal.addDisposeCallback(this.anchor.element, function () {
             this.subscriptions.forEach(function (item) {
                 item.dispose();
             });
         }.bind(this));
     }
+
+    Popup.prototype.observe = function (newValue) {
+        var that = this;
+        if (newValue) {
+            // if the popup is being opened
+            this.options.beforeOpen();
+            this.open(function () {
+                that.options.afterOpen();
+            });
+        } else {
+            // if the popup is closed closed
+            this.options.beforeClose();
+            this.close(function () {
+                that.options.afterClose();
+            });
+        }
+    };
 
     Popup.prototype.createElementContainer = function () {
         var $popupHolder;
@@ -169,6 +205,25 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         callMeMaybe(done);
     };
 
+    Popup.prototype.open = function (done) {
+        var that = this;
+        if (this.options.renderOnOpen) {
+            this.render(function () {
+                that.reposition();
+                callMeMaybe(done);
+            });
+        } else {
+            this.show(done);
+        }
+    };
+
+    Popup.prototype.close = function (done) {
+        if (this.options.renderOnOpen) {
+            this.remove(done);
+        } else {
+            this.hide(done);
+        }
+    };
 
     ko.bindingHandlers.popupTemplate = {
         init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
@@ -216,10 +271,14 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 config.positioning.vertical = ko.observable('outside-bottom');
             }
 
-            var subscriptions = [];
             var $element = $(element);
 
             // REFACTORED STUFF START
+            if (config.outsideHandler) {
+                config.afterOpen = beforeCallingCall(config.afterOpen, addCloseHandler);
+                config.beforeClose = beforeCallingCall(config.beforeClose, removeCloseHandler);
+            }
+
             var anchor = new Anchor({
                 element: element,
                 openState: config.openState
@@ -235,7 +294,14 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 bindingContext: bindingContext,
                 template: config.template,
                 disposalCallback: config.disposalCallback,
-                positioning: config.positioning
+                openState: config.openState,
+                positioning: config.positioning,
+                beforeOpen: config.beforeOpen,
+                renderOnOpen: config.renderOnOpen,
+                renderOnInit: config.renderOnInit,
+                afterOpen: config.afterOpen,
+                beforeClose: config.beforeClose,
+                afterClose: config.afterClose
             });
             // REFACTORED STUFF END
 
@@ -276,52 +342,6 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 document.removeEventListener('mousedown', closePopupHandler, true);
             }
 
-            var opener, closer;
-            if (config.renderOnOpen) {
-                opener = function (done) {
-                    popup.render(function () {
-                        popup.reposition();
-                        callMeMaybe(done);
-                    });
-                };
-                closer = popup.remove.bind(popup);
-            } else {
-                popup.render();
-                opener = popup.show.bind(popup);
-                closer = popup.hide.bind(popup);
-                closer();
-            }
-
-            function render(newValue) {
-                if (newValue) {
-                    // if the popup is being opened
-                    config.beforeOpen();
-                    opener(function () {
-                        if (config.outsideHandler) addCloseHandler();
-                        config.afterOpen();
-                    });
-                } else {
-                    // if the popup is closed closed
-                    config.beforeClose();
-                    if (config.outsideHandler) removeCloseHandler();
-                    closer(function () {
-                        config.afterClose();
-                    });
-                }
-            }
-
-            subscriptions.push(config.openState.subscribe(render));
-
-            // initial render if the popup is supposed to start open
-            if (config.openState()) {
-                render(true);
-            }
-
-            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                subscriptions.forEach(function (item) {
-                    item.dispose();
-                });
-            });
         }
     };
 
