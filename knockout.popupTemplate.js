@@ -273,15 +273,15 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             config = configFixupPositioning(config);
             config = configFixupOpenState(config);
 
-            if (config.outsideHandler) {
-                config.afterOpen = callInSequence(addCloseHandler, config.afterOpen);
-                config.beforeClose = callInSequence(config.beforeClose, removeCloseHandler);
-            }
-
             var popup = new Popup(element, bindingContext, config);
 
             var $popupHolder = popup.$popupHolder;
             var $element = $(element);
+
+            if (config.outsideHandler) {
+                config.afterOpen = callInSequence(addCloseHandler, config.afterOpen);
+                config.beforeClose = callInSequence(config.beforeClose, removeCloseHandler);
+            }
 
             if (config.anchorHandler) {
                 $element.on('mousedown.popupTemplate', function (event) {
