@@ -47,10 +47,14 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         if (typeof callback === 'function') { callback(); }
     }
 
-    function beforeCallingCall(origFn, fn) {
+    function callInSequence() {
+        var args = Array.prototype.slice.call(arguments);
         return function () {
-            callMeMaybe(origFn);
-            callMeMaybe(fn);
+            args.filter(function (arg) {
+                return typeof arg === 'function';
+            }).forEach(function (arg) {
+                arg.apply(null, arguments);
+            });
         };
     }
 
@@ -275,8 +279,8 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
             // REFACTORED STUFF START
             if (config.outsideHandler) {
-                config.afterOpen = beforeCallingCall(config.afterOpen, addCloseHandler);
-                config.beforeClose = beforeCallingCall(config.beforeClose, removeCloseHandler);
+                config.afterOpen = callInSequence(config.afterOpen, addCloseHandler);
+                config.beforeClose = callInSequence(config.beforeClose, removeCloseHandler);
             }
 
             var anchor = new Anchor({
