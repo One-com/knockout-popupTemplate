@@ -58,27 +58,11 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         };
     }
 
-    function Anchor(options) {
-        this.element = options.element;
-        this.$element = $(this.element);
-
-        this.openState = options.openState;
-    }
-
-    Anchor.prototype.setupHandler = function () {
-        var that = this;
-        this.$element.on('mousedown.popupTemplate', function (event) {
-            if (event.which === 1) {
-                that.openState(!that.openState());
-                event.stopPropagation();
-                event.preventDefault();
-            }
-        });
-    };
-
-    function Popup(anchor, options) {
-        this.anchor = anchor;
+    function Popup(element, bindingContext, options) {
+        this.element = element;
+        this.$element = $(element);
         this.options = options;
+        this.bindingContext = bindingContext;
 
         this.subscriptions = [];
 
@@ -97,7 +81,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             this.observe(true);
         }
 
-        ko.utils.domNodeDisposal.addDisposeCallback(this.anchor.element, function () {
+        ko.utils.domNodeDisposal.addDisposeCallback(this.element, function () {
             this.subscriptions.forEach(function (item) {
                 item.dispose();
             });
@@ -139,10 +123,10 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     Popup.prototype.render = function (done) {
         this.$popupHolder.appendTo($('body'));
         var innerBindingContext = ('data' in this.options) ?
-            this.options.bindingContext.createChildContext(ko.utils.unwrapObservable(this.options.data)) :  // Given an explicit 'data' value, we create a child binding context for it
-            this.options.bindingContext;                                               // Given no explicit 'data' value, we retain the same binding context
+            this.bindingContext.createChildContext(ko.utils.unwrapObservable(this.options.data)) :  // Given an explicit 'data' value, we create a child binding context for it
+            this.bindingContext;                                               // Given no explicit 'data' value, we retain the same binding context
         ko.renderTemplate(this.options.template, innerBindingContext, { afterRender: done }, this.$popupHolder[0]);
-        ko.utils.domNodeDisposal.addDisposeCallback(this.anchor.element, this.remove.bind(this));
+        ko.utils.domNodeDisposal.addDisposeCallback(this.element, this.remove.bind(this));
     };
 
     Popup.prototype.remove = function (done) {
@@ -156,7 +140,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
     Popup.prototype.reposition = function () {
         if (!this.$popupHolder) { return; }
-        var position = this.anchor.$element.offset();
+        var position = this.$element.offset();
         switch (this.options.positioning.horizontal()) {
         case 'outside-left':
             position.left -= this.$popupHolder.outerWidth();
@@ -165,15 +149,15 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             // No change in left coord.
             break;
         case 'middle':
-            position.left += Math.round(this.anchor.$element.outerWidth() / 2);
+            position.left += Math.round(this.$element.outerWidth() / 2);
             position.left -= Math.round(this.$popupHolder.width() / 2);
             break;
         case 'inside-right':
-            position.left += this.anchor.$element.outerWidth();
+            position.left += this.$element.outerWidth();
             position.left -= this.$popupHolder.width();
             break;
         case 'outside-right':
-            position.left += this.anchor.$element.outerWidth();
+            position.left += this.$element.outerWidth();
             break;
         }
         switch (this.options.positioning.vertical()) {
@@ -184,15 +168,15 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             // No change in top coord
             break;
         case 'middle':
-            position.top += Math.round(this.anchor.$element.outerHeight() / 2);
+            position.top += Math.round(this.$element.outerHeight() / 2);
             position.top -= Math.round(this.$popupHolder.height() / 2);
             break;
         case 'inside-bottom':
-            position.top += this.anchor.$element.outerHeight();
+            position.top += this.$element.outerHeight();
             position.top -= this.$popupHolder.height();
             break;
         case 'outside-bottom':
-            position.top += this.anchor.$element.outerHeight();
+            position.top += this.$element.outerHeight();
             break;
         }
         this.$popupHolder.offset(position);
@@ -279,33 +263,20 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 config.beforeClose = callInSequence(config.beforeClose, removeCloseHandler);
             }
 
-            var anchor = new Anchor({
-                element: element,
-                openState: config.openState
-            });
-
-            if (config.anchorHandler) {
-                anchor.setupHandler();
-            }
-
-            var popup = new Popup(anchor, {
-                className: config.className,
-                data: config.data,
-                bindingContext: bindingContext,
-                template: config.template,
-                disposalCallback: config.disposalCallback,
-                openState: config.openState,
-                positioning: config.positioning,
-                beforeOpen: config.beforeOpen,
-                renderOnInit: config.renderOnInit,
-                afterOpen: config.afterOpen,
-                beforeClose: config.beforeClose,
-                afterClose: config.afterClose
-            });
+            var popup = new Popup(element, bindingContext, config);
 
             var $popupHolder = popup.$popupHolder;
             var $element = $(element);
 
+            if (config.anchorHandler) {
+                $element.on('mousedown.popupTemplate', function (event) {
+                    if (event.which === 1) {
+                        config.openState(!config.openState());
+                        event.stopPropagation();
+                        event.preventDefault();
+                    }
+                });
+            }
 
             function closePopupHandler(event) {
                 if (event.which === 1 && config.openState()) {
