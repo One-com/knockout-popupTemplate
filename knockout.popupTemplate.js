@@ -275,9 +275,6 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 config.positioning.vertical = ko.observable('outside-bottom');
             }
 
-            var $element = $(element);
-
-            // REFACTORED STUFF START
             if (config.outsideHandler) {
                 config.afterOpen = callInSequence(addCloseHandler, config.afterOpen);
                 config.beforeClose = callInSequence(config.beforeClose, removeCloseHandler);
@@ -307,9 +304,10 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 beforeClose: config.beforeClose,
                 afterClose: config.afterClose
             });
-            // REFACTORED STUFF END
 
             var $popupHolder = popup.$popupHolder;
+            var $element = $(element);
+
 
             function closePopupHandler(event) {
                 if (event.which === 1 && config.openState()) {
