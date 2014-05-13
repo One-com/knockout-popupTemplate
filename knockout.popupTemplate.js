@@ -36,7 +36,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         define(['jquery', 'knockout'], factory);
     } else {
         /* global $, ko */
-        root.BeforeUnload = factory($, ko);
+        factory($, ko);
     }
 }(this, function ($, ko) {
 
