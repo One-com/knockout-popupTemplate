@@ -43,6 +43,24 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     var HORIZONTAL_POSITIONS = ['outside-left', 'inside-left', 'middle', 'inside-right', 'outside-right'];
     var VERTICAL_POSITIONS = ['outside-top', 'inside-top', 'middle', 'inside-bottom', 'outside-bottom'];
 
+    function Anchor(options) {
+        this.element = options.element;
+        this.$element = $(this.element);
+
+        this.openState = options.openState;
+    }
+
+    Anchor.prototype.setupHandler = function () {
+        var that = this;
+        this.$element.on('mousedown.popupTemplate', function (event) {
+            if (event.which === 1) {
+                that.openState(!that.openState());
+                event.stopPropagation();
+                event.preventDefault();
+            }
+        });
+    };
+
     ko.bindingHandlers.popupTemplate = {
         init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
             var config = valueAccessor();
@@ -92,6 +110,17 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             var subscriptions = [];
             var $element = $(element);
             var $popupHolder;
+
+            // REFACTORED STUFF START
+            var anchor = new Anchor({
+                element: element,
+                openState: config.openState
+            });
+
+            if (config.anchorHandler) {
+                anchor.setupHandler();
+            }
+            // REFACTORED STUFF END
 
             function renderPopup(done) {
                 var popupClassName = 'popupTemplate';
@@ -224,16 +253,6 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 opener = showPopup;
                 closer = hidePopup;
                 closer();
-            }
-
-            if (config.anchorHandler) {
-                $element.on('mousedown.popupTemplate', function (event) {
-                    if (event.which === 1) {
-                        config.openState(!config.openState());
-                        event.stopPropagation();
-                        event.preventDefault();
-                    }
-                });
             }
 
             function render(newValue) {
