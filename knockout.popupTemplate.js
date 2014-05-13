@@ -73,6 +73,12 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         this.subscriptions = [];
 
         this.$popupHolder = this.createElementContainer();
+
+        ko.utils.domNodeDisposal.addDisposeCallback(this.anchor.element, function () {
+            this.subscriptions.forEach(function (item) {
+                item.dispose();
+            });
+        }.bind(this));
     }
 
     Popup.prototype.createElementContainer = function () {
