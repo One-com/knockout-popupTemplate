@@ -279,7 +279,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
             // REFACTORED STUFF START
             if (config.outsideHandler) {
-                config.afterOpen = callInSequence(config.afterOpen, addCloseHandler);
+                config.afterOpen = callInSequence(addCloseHandler, config.afterOpen);
                 config.beforeClose = callInSequence(config.beforeClose, removeCloseHandler);
             }
 
