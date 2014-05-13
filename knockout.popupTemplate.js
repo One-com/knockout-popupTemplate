@@ -149,7 +149,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         if (this.options.disposalCallback) {
             this.options.disposalCallback(this.$popupHolder[0]);
         } else {
-            this.$popupHolder.remove();
+            ko.removeNode(this.$popupHolder[0]);
         }
         callMeMaybe(done);
     };
