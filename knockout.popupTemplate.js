@@ -147,6 +147,17 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         this.$popupHolder.offset(position);
     };
 
+    Popup.prototype.hide = function (done) {
+        this.$popupHolder.css('visibility', 'hidden');
+        if (typeof done === 'function') { done(); }
+    };
+
+    Popup.prototype.show = function (done) {
+        this.$popupHolder.css('visibility', 'visible');
+        this.reposition();
+        done();
+    };
+
 
     ko.bindingHandlers.popupTemplate = {
         init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
@@ -254,17 +265,6 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 document.removeEventListener('mousedown', closePopupHandler, true);
             }
 
-            function hidePopup(done) {
-                $popupHolder.css('visibility', 'hidden');
-                if (typeof done === 'function') { done(); }
-            }
-
-            function showPopup(done) {
-                $popupHolder.css('visibility', 'visible');
-                popup.reposition();
-                done();
-            }
-
             var opener, closer;
             if (config.renderOnOpen) {
                 opener = function (done) {
@@ -276,8 +276,8 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 closer = popup.remove.bind(popup);
             } else {
                 popup.render();
-                opener = showPopup;
-                closer = hidePopup;
+                opener = popup.show.bind(popup);
+                closer = popup.hide.bind(popup);
                 closer();
             }
 
