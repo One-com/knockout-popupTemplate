@@ -40,129 +40,258 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     }
 }(this, function ($, ko) {
 
+    function callMeMaybe(callback) {
+        if (typeof callback === 'function') { callback(); }
+    }
+
+    function callInSequence() {
+        var args = Array.prototype.slice.call(arguments);
+        return function () {
+            args.filter(function (arg) {
+                return typeof arg === 'function';
+            }).forEach(function (arg) {
+                arg.apply(null, arguments);
+            });
+        };
+    }
+
+    function Popup(element, bindingContext, options) {
+        this.element = element;
+        this.$element = $(element);
+        this.options = options;
+        this.bindingContext = bindingContext;
+
+        this.subscriptions = [];
+
+        this.$popupHolder = this.createElementContainer();
+
+        this.subscriptions.push(this.options.openState.subscribe(this.observe.bind(this)));
+
+        if (this.options.renderOnInit) {
+            this.render();
+            this.reposition();
+            this.close();
+        }
+
+        // initial render if the popup is supposed to start open
+        if (this.options.openState()) {
+            this.observe(true);
+        }
+
+        ko.utils.domNodeDisposal.addDisposeCallback(this.element, function () {
+            this.subscriptions.forEach(function (item) {
+                item.dispose();
+            });
+        }.bind(this));
+    }
+
+    Popup.prototype.observe = function (newValue) {
+        var that = this;
+        if (newValue) {
+            // if the popup is being opened
+            this.options.beforeOpen();
+            this.open(function () {
+                that.options.afterOpen();
+            });
+        } else {
+            // if the popup is closed closed
+            this.options.beforeClose();
+            this.close(function () {
+                that.options.afterClose();
+            });
+        }
+    };
+
+    Popup.prototype.createElementContainer = function () {
+        var $popupHolder;
+        var popupClassName = 'popupTemplate';
+        if (this.options.className) {
+            popupClassName += ' ' + this.options.className;
+        }
+        $popupHolder = $('<div class="' + popupClassName + '"></div>');
+        $popupHolder.css('position', 'absolute');
+
+        this.subscriptions.push(this.options.positioning.horizontal.subscribe(this.reposition.bind(this)));
+        this.subscriptions.push(this.options.positioning.vertical.subscribe(this.reposition.bind(this)));
+
+        return $popupHolder;
+    };
+
+    Popup.prototype.render = function (done) {
+        this.$popupHolder.appendTo($('body'));
+        var innerBindingContext = ('data' in this.options) ?
+            this.bindingContext.createChildContext(ko.utils.unwrapObservable(this.options.data)) :  // Given an explicit 'data' value, we create a child binding context for it
+            this.bindingContext;                                               // Given no explicit 'data' value, we retain the same binding context
+        ko.renderTemplate(this.options.template, innerBindingContext, { afterRender: done }, this.$popupHolder[0]);
+        ko.utils.domNodeDisposal.addDisposeCallback(this.element, this.remove.bind(this));
+    };
+
+    Popup.prototype.remove = function (done) {
+        if (this.options.disposalCallback) {
+            this.options.disposalCallback(this.$popupHolder[0]);
+        } else {
+            ko.removeNode(this.$popupHolder[0]);
+        }
+        callMeMaybe(done);
+    };
+
+    Popup.prototype.reposition = function () {
+        if (!this.$popupHolder) { return; }
+        var position = this.$element.offset();
+        switch (this.options.positioning.horizontal()) {
+        case 'outside-left':
+            position.left -= this.$popupHolder.outerWidth();
+            break;
+        case 'inside-left':
+            // No change in left coord.
+            break;
+        case 'middle':
+            position.left += Math.round(this.$element.outerWidth() / 2);
+            position.left -= Math.round(this.$popupHolder.width() / 2);
+            break;
+        case 'inside-right':
+            position.left += this.$element.outerWidth();
+            position.left -= this.$popupHolder.width();
+            break;
+        case 'outside-right':
+            position.left += this.$element.outerWidth();
+            break;
+        }
+        switch (this.options.positioning.vertical()) {
+        case 'outside-top':
+            position.top -= this.$popupHolder.height();
+            break;
+        case 'inside-top':
+            // No change in top coord
+            break;
+        case 'middle':
+            position.top += Math.round(this.$element.outerHeight() / 2);
+            position.top -= Math.round(this.$popupHolder.height() / 2);
+            break;
+        case 'inside-bottom':
+            position.top += this.$element.outerHeight();
+            position.top -= this.$popupHolder.height();
+            break;
+        case 'outside-bottom':
+            position.top += this.$element.outerHeight();
+            break;
+        }
+        this.$popupHolder.offset(position);
+    };
+
+    Popup.prototype.hide = function (done) {
+        this.$popupHolder.css('visibility', 'hidden');
+        callMeMaybe(done);
+    };
+
+    Popup.prototype.show = function (done) {
+        this.$popupHolder.css('visibility', 'visible');
+        this.reposition();
+        callMeMaybe(done);
+    };
+
+    Popup.prototype.open = function (done) {
+        var that = this;
+        if (this.options.renderOnInit) {
+            this.show(done);
+        } else {
+            this.render(function () {
+                that.reposition();
+                callMeMaybe(done);
+            });
+        }
+    };
+
+    Popup.prototype.close = function (done) {
+        if (this.options.renderOnInit) {
+            this.hide(done);
+        } else {
+            this.remove(done);
+        }
+    };
+
     var HORIZONTAL_POSITIONS = ['outside-left', 'inside-left', 'middle', 'inside-right', 'outside-right'];
     var VERTICAL_POSITIONS = ['outside-top', 'inside-top', 'middle', 'inside-bottom', 'outside-bottom'];
+
+    function configFixupPositioning(config) {
+        if (HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal) !== -1) {
+            config.positioning.horizontal = ko.observable(config.positioning.horizontal);
+        } else if (ko.isObservable(config.positioning.horizontal) && HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal()) !== -1) {
+        } else if (ko.isObservable(config.positioning.horizontal)) {
+            config.positioning.horizontal('inside-left');
+        } else {
+            config.positioning.horizontal = ko.observable('inside-left');
+        }
+        if (VERTICAL_POSITIONS.indexOf(config.positioning.vertical) !== -1) {
+            config.positioning.vertical = ko.observable(config.positioning.vertical);
+        } else if (ko.isObservable(config.positioning.vertical) && VERTICAL_POSITIONS.indexOf(config.positioning.vertical()) !== -1) {
+        } else if (ko.isObservable(config.positioning.vertical)) {
+            config.positioning.vertical('outside-bottom');
+        } else {
+            config.positioning.vertical = ko.observable('outside-bottom');
+        }
+
+        return config;
+    }
+
+    function configFixupOpenState(config) {
+        if (!ko.isObservable(config.openState)) {
+            if (typeof config.openState === 'boolean') {
+                config.openState = ko.observable(config.openState);
+            } else {
+                config.openState = ko.observable(false);
+            }
+        }
+
+        return config;
+    }
 
     ko.bindingHandlers.popupTemplate = {
         init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
             var config = valueAccessor();
+            var defaultConfiguration = {
+                renderOnInit: false,
+                className: '',
+                beforeOpen: function () {},
+                afterOpen: function () {},
+                beforeClose: function () {},
+                afterClose: function () {},
+                positioning: {},
+                anchorHandler: true,
+                outsideHandler: true,
+                disposalCallBack: null,
+                data: bindingContext.$data
+            };
+
             if (typeof config === 'string') {
                 config = {
                     template: config
                 };
             }
 
-            if (!ko.isObservable(config.openState)) {
-                if (typeof config.openState === 'boolean') {
-                    config.openState = ko.observable(config.openState);
-                } else {
-                    config.openState = ko.observable(false);
-                }
-            }
+            config = ko.utils.extend(defaultConfiguration, config);
+            config = configFixupPositioning(config);
+            config = configFixupOpenState(config);
 
-            config.renderOnInit = !!config.renderOnInit;
-            config.renderOnOpen = !config.renderOnInit;
-            config.className = config.className || '';
-            config.data = config.data || bindingContext.$data;
-            config.beforeOpen = config.beforeOpen || function () {};
-            config.afterOpen = config.afterOpen || function () {};
-            config.beforeClose = config.beforeClose || function () {};
-            config.afterClose = config.afterClose || function () {};
-            config.positioning = config.positioning || {};
-            config.anchorHandler = config.anchorHandler === false ? false : true;
-            config.outsideHandler = config.outsideHandler === false ? false : true;
-            config.disposalCallback = config.disposalCallback || null;
-            if (HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal) !== -1) {
-                config.positioning.horizontal = ko.observable(config.positioning.horizontal);
-            } else if (ko.isObservable(config.positioning.horizontal) && HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal()) !== -1) {
-            } else if (ko.isObservable(config.positioning.horizontal)) {
-                config.positioning.horizontal('inside-left');
-            } else {
-                config.positioning.horizontal = ko.observable('inside-left');
-            }
-            if (VERTICAL_POSITIONS.indexOf(config.positioning.vertical) !== -1) {
-                config.positioning.vertical = ko.observable(config.positioning.vertical);
-            } else if (ko.isObservable(config.positioning.vertical) && VERTICAL_POSITIONS.indexOf(config.positioning.vertical()) !== -1) {
-            } else if (ko.isObservable(config.positioning.vertical)) {
-                config.positioning.vertical('outside-bottom');
-            } else {
-                config.positioning.vertical = ko.observable('outside-bottom');
-            }
+            var popup = new Popup(element, bindingContext, config);
 
-            var subscriptions = [];
+            var $popupHolder = popup.$popupHolder;
             var $element = $(element);
-            var $popupHolder;
 
-            function renderPopup(done) {
-                var popupClassName = 'popupTemplate';
-                if (config.className) {
-                    popupClassName += ' ' + config.className;
-                }
-                $popupHolder = $('<div class="' + popupClassName + '"></div>');
-                $popupHolder.appendTo($('body'));
-                $popupHolder.css('position', 'absolute');
-                var innerBindingContext = ('data' in config) ?
-                    bindingContext.createChildContext(ko.utils.unwrapObservable(config.data, config.as)) :  // Given an explicit 'data' value, we create a child binding context for it
-                    bindingContext;                                               // Given no explicit 'data' value, we retain the same binding context
-                ko.renderTemplate(config.template, innerBindingContext, { afterRender: done }, $popupHolder[0]);
-                ko.utils.domNodeDisposal.addDisposeCallback(element, removePopup);
+            if (config.outsideHandler) {
+                config.afterOpen = callInSequence(addCloseHandler, config.afterOpen);
+                config.beforeClose = callInSequence(config.beforeClose, removeCloseHandler);
             }
 
-            function removePopup(done) {
-                if (config.disposalCallback) {
-                    config.disposalCallback($popupHolder[0]);
-                } else {
-                    $popupHolder.remove();
-                }
-                if (typeof done === 'function') { done(); }
+            if (config.anchorHandler) {
+                $element.on('mousedown.popupTemplate', function (event) {
+                    if (event.which === 1) {
+                        config.openState(!config.openState());
+                        event.stopPropagation();
+                        event.preventDefault();
+                    }
+                });
             }
-
-
-            function repositionPopup() {
-                var position = $element.offset();
-                switch (config.positioning.horizontal()) {
-                case 'outside-left':
-                    position.left -= $popupHolder.outerWidth();
-                    break;
-                case 'inside-left':
-                    // No change in left coord.
-                    break;
-                case 'middle':
-                    position.left += Math.round($element.outerWidth() / 2);
-                    position.left -= Math.round($popupHolder.width() / 2);
-                    break;
-                case 'inside-right':
-                    position.left += $element.outerWidth();
-                    position.left -= $popupHolder.width();
-                    break;
-                case 'outside-right':
-                    position.left += $element.outerWidth();
-                    break;
-                }
-                switch (config.positioning.vertical()) {
-                case 'outside-top':
-                    position.top -= $popupHolder.height();
-                    break;
-                case 'inside-top':
-                    // No change in top coord
-                    break;
-                case 'middle':
-                    position.top += Math.round($element.outerHeight() / 2);
-                    position.top -= Math.round($popupHolder.height() / 2);
-                    break;
-                case 'inside-bottom':
-                    position.top += $element.outerHeight();
-                    position.top -= $popupHolder.height();
-                    break;
-                case 'outside-bottom':
-                    position.top += $element.outerHeight();
-                    break;
-                }
-                $popupHolder.offset(position);
-            }
-
-            subscriptions.push(config.positioning.horizontal.subscribe(repositionPopup));
-            subscriptions.push(config.positioning.vertical.subscribe(repositionPopup));
 
             function closePopupHandler(event) {
                 if (event.which === 1 && config.openState()) {
@@ -199,73 +328,6 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 document.removeEventListener('mousedown', closePopupHandler, true);
             }
 
-            function hidePopup(done) {
-                $popupHolder.css('visibility', 'hidden');
-                if (typeof done === 'function') { done(); }
-            }
-
-            function showPopup(done) {
-                $popupHolder.css('visibility', 'visible');
-                repositionPopup();
-                done();
-            }
-
-            var opener, closer;
-            if (config.renderOnOpen) {
-                opener = function (done) {
-                    renderPopup(function () {
-                        repositionPopup();
-                        done();
-                    });
-                };
-                closer = removePopup;
-            } else {
-                renderPopup();
-                opener = showPopup;
-                closer = hidePopup;
-                closer();
-            }
-
-            if (config.anchorHandler) {
-                $element.on('mousedown.popupTemplate', function (event) {
-                    if (event.which === 1) {
-                        config.openState(!config.openState());
-                        event.stopPropagation();
-                        event.preventDefault();
-                    }
-                });
-            }
-
-            function render(newValue) {
-                if (newValue) {
-                    // if the popup is being opened
-                    config.beforeOpen();
-                    opener(function () {
-                        if (config.outsideHandler) addCloseHandler();
-                        config.afterOpen();
-                    });
-                } else {
-                    // if the popup is closed closed
-                    config.beforeClose();
-                    if (config.outsideHandler) removeCloseHandler();
-                    closer(function () {
-                        config.afterClose();
-                    });
-                }
-            }
-
-            subscriptions.push(config.openState.subscribe(render));
-
-            // initial render if the popup is supposed to start open
-            if (config.openState()) {
-                render(true);
-            }
-
-            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-                subscriptions.forEach(function (item) {
-                    item.dispose();
-                });
-            });
         }
     };
 
