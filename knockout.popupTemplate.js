@@ -40,9 +40,6 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     }
 }(this, function ($, ko) {
 
-    var HORIZONTAL_POSITIONS = ['outside-left', 'inside-left', 'middle', 'inside-right', 'outside-right'];
-    var VERTICAL_POSITIONS = ['outside-top', 'inside-top', 'middle', 'inside-bottom', 'outside-bottom'];
-
     function callMeMaybe(callback) {
         if (typeof callback === 'function') { callback(); }
     }
@@ -213,8 +210,45 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         }
     };
 
+    var HORIZONTAL_POSITIONS = ['outside-left', 'inside-left', 'middle', 'inside-right', 'outside-right'];
+    var VERTICAL_POSITIONS = ['outside-top', 'inside-top', 'middle', 'inside-bottom', 'outside-bottom'];
+
+    function configFixupPositioning(config) {
+        if (HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal) !== -1) {
+            config.positioning.horizontal = ko.observable(config.positioning.horizontal);
+        } else if (ko.isObservable(config.positioning.horizontal) && HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal()) !== -1) {
+        } else if (ko.isObservable(config.positioning.horizontal)) {
+            config.positioning.horizontal('inside-left');
+        } else {
+            config.positioning.horizontal = ko.observable('inside-left');
+        }
+        if (VERTICAL_POSITIONS.indexOf(config.positioning.vertical) !== -1) {
+            config.positioning.vertical = ko.observable(config.positioning.vertical);
+        } else if (ko.isObservable(config.positioning.vertical) && VERTICAL_POSITIONS.indexOf(config.positioning.vertical()) !== -1) {
+        } else if (ko.isObservable(config.positioning.vertical)) {
+            config.positioning.vertical('outside-bottom');
+        } else {
+            config.positioning.vertical = ko.observable('outside-bottom');
+        }
+
+        return config;
+    }
+
+    function configFixupOpenState(config) {
+        if (!ko.isObservable(config.openState)) {
+            if (typeof config.openState === 'boolean') {
+                config.openState = ko.observable(config.openState);
+            } else {
+                config.openState = ko.observable(false);
+            }
+        }
+
+        return config;
+    }
+
     ko.bindingHandlers.popupTemplate = {
         init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+            var config = valueAccessor();
             var defaultConfiguration = {
                 renderOnInit: false,
                 className: '',
@@ -229,7 +263,6 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 data: bindingContext.$data
             };
 
-            var config = valueAccessor();
             if (typeof config === 'string') {
                 config = {
                     template: config
@@ -237,31 +270,8 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             }
 
             config = ko.utils.extend(defaultConfiguration, config);
-
-            if (!ko.isObservable(config.openState)) {
-                if (typeof config.openState === 'boolean') {
-                    config.openState = ko.observable(config.openState);
-                } else {
-                    config.openState = ko.observable(false);
-                }
-            }
-
-            if (HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal) !== -1) {
-                config.positioning.horizontal = ko.observable(config.positioning.horizontal);
-            } else if (ko.isObservable(config.positioning.horizontal) && HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal()) !== -1) {
-            } else if (ko.isObservable(config.positioning.horizontal)) {
-                config.positioning.horizontal('inside-left');
-            } else {
-                config.positioning.horizontal = ko.observable('inside-left');
-            }
-            if (VERTICAL_POSITIONS.indexOf(config.positioning.vertical) !== -1) {
-                config.positioning.vertical = ko.observable(config.positioning.vertical);
-            } else if (ko.isObservable(config.positioning.vertical) && VERTICAL_POSITIONS.indexOf(config.positioning.vertical()) !== -1) {
-            } else if (ko.isObservable(config.positioning.vertical)) {
-                config.positioning.vertical('outside-bottom');
-            } else {
-                config.positioning.vertical = ko.observable('outside-bottom');
-            }
+            config = configFixupPositioning(config);
+            config = configFixupOpenState(config);
 
             if (config.outsideHandler) {
                 config.afterOpen = callInSequence(addCloseHandler, config.afterOpen);
