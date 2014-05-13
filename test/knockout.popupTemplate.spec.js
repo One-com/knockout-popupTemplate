@@ -708,5 +708,91 @@ describe('popupTemplate', function () {
                 });
             });
         });
+        describe('open/closed classes', function () {
+            var config, element;
+            var applyBindings = function () {
+                ko.applyBindings({ config: config }, $testElement[0]);
+            };
+
+            beforeEach(function () {
+                config = {
+                    template: 'popupTemplate',
+                    openState: ko.observable(false)
+                };
+                $('<div id="anchor" data-bind="popupTemplate: config" style="margin-left: 300px; width: 200px; height: 50px; padding: 5px; border: 1px solid black;">Popup</div>').appendTo($testElement);
+                element = $('#anchor', $testElement)[0];
+            });
+
+            afterEach(function () {
+                ko.cleanNode($testElement[0]);
+                $testElement.empty();
+            });
+
+            it('should have class open if its open', function () {
+                applyBindings();
+                config.openState(true);
+                expect($('body>.popupTemplate').hasClass('open'), 'to be ok');
+            });
+
+            it('should have class open if its open from the start', function () {
+                config.openState(true);
+                applyBindings();
+                expect($('body>.popupTemplate').hasClass('open'), 'to be ok');
+            });
+
+            it('should have class closed if its not yet removed', function () {
+                config.disposalCallback = function () {}; // dont remove the element when it's closed
+                applyBindings();
+                config.openState(true);
+                expect($('body>.popupTemplate').hasClass('open'), 'to be ok');
+                config.openState(false);
+                expect($('body>.popupTemplate').hasClass('open'), 'to be false');
+                expect($('body>.popupTemplate').hasClass('closed'), 'to be true');
+                $('body>.popupTemplate').remove(); // manual cleanup
+            });
+
+            describe('renderOnInit', function () {
+
+                beforeEach(function () {
+                    config = {
+                        template: 'popupTemplate',
+                        openState: ko.observable(false),
+                        renderOnInit: true
+                    };
+                    $('<div id="anchor" data-bind="popupTemplate: config" style="margin-left: 300px; width: 200px; height: 50px; padding: 5px; border: 1px solid black;">Popup</div>').appendTo($testElement);
+                    element = $('#anchor', $testElement)[0];
+                });
+
+                afterEach(function () {
+                    ko.cleanNode($testElement[0]);
+                    $testElement.empty();
+                });
+
+                it('should have class closed if its not yet opened', function () {
+                    applyBindings();
+                    expect($('body>.popupTemplate').hasClass('closed'), 'to be ok');
+                    expect($('body>.popupTemplate').hasClass('open'), 'not to be ok');
+                });
+                it('should have class open when it is opened', function () {
+                    applyBindings();
+                    config.openState(true);
+                    expect($('body>.popupTemplate').hasClass('open'), 'to be ok');
+                    expect($('body>.popupTemplate').hasClass('closed'), 'not to be ok');
+                });
+                it('should have class open when it is opened from the start', function () {
+                    config.openState(true);
+                    applyBindings();
+                    expect($('body>.popupTemplate').hasClass('open'), 'to be ok');
+                    expect($('body>.popupTemplate').hasClass('closed'), 'not to be ok');
+                });
+                it('should have class closed when it is opened and then closed', function () {
+                    applyBindings();
+                    config.openState(true);
+                    config.openState(false);
+                    expect($('body>.popupTemplate').hasClass('closed'), 'to be ok');
+                    expect($('body>.popupTemplate').hasClass('open'), 'not to be ok');
+                });
+            });
+        });
     });
 });

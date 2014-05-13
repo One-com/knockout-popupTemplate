@@ -190,13 +190,20 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         callMeMaybe(done);
     };
 
+    Popup.prototype.toggleClasses = function (bool) {
+        this.$popupHolder.toggleClass('open', bool);
+        this.$popupHolder.toggleClass('closed', !bool);
+    };
+
     Popup.prototype.open = function (done) {
         var that = this;
         if (this.options.renderOnInit) {
+            this.toggleClasses(true);
             this.show(done);
         } else {
             this.render(function () {
                 that.reposition();
+                that.toggleClasses(true);
                 callMeMaybe(done);
             });
         }
@@ -204,8 +211,10 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
     Popup.prototype.close = function (done) {
         if (this.options.renderOnInit) {
+            this.toggleClasses(false);
             this.hide(done);
         } else {
+            this.toggleClasses(false);
             this.remove(done);
         }
     };
