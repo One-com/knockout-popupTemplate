@@ -337,6 +337,10 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 document.removeEventListener('mousedown', closePopupHandler, true);
             }
 
+
+            ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+                removeCloseHandler();
+            });
         }
     };
 
