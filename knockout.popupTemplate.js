@@ -120,7 +120,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     Popup.prototype.render = function (done) {
         this.$popupHolder.appendTo($('body'));
         var innerBindingContext = ('data' in this.options) ?
-            this.bindingContext.createChildContext(ko.utils.unwrapObservable(this.options.data)) :  // Given an explicit 'data' value, we create a child binding context for it
+            this.bindingContext.createChildContext(this.options.data) :  // Given an explicit 'data' value, we create a child binding context for it
             this.bindingContext;                                               // Given no explicit 'data' value, we retain the same binding context
         ko.renderTemplate(this.options.template, innerBindingContext, { afterRender: done }, this.$popupHolder[0]);
         ko.utils.domNodeDisposal.addDisposeCallback(this.element, this.remove.bind(this));
@@ -268,8 +268,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 positioning: {},
                 anchorHandler: true,
                 outsideHandler: true,
-                disposalCallBack: null,
-                data: bindingContext.$data
+                disposalCallBack: null
             };
 
             if (typeof config === 'string') {
