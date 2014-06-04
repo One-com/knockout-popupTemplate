@@ -24,7 +24,7 @@
   "devDependencies": {
     "mocha": "=1.9.0",
     "sinon": "=1.9.1",
-    "unexpected": "=3.1.1",
+    "unexpected": "=3.2.2",
     "unexpected-sinon": "=3.0.1",
     "unexpected-knockout": "=0.0.1",
     "mocha-phantomjs": "=3.3.2",

@@ -49,12 +49,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     template: config
                 };
             }
-            config.data = config.data || bindingContext.$data;
             config.beforeOpen = config.beforeOpen || function () {};
             config.afterOpen = config.afterOpen || function () {};
             config.beforeClose = config.beforeClose || function () {};
             config.afterClose = config.afterClose || function () {};
-            config.openState = ko.isObservable(config.openState) ? config.openState : ko.observable(false);
+            if (typeof config.openState === 'undefined') {
+                config.openState = ko.observable(false);
+            } else if (ko.isObservable(config.openState)) {
+                config.openState(!!config.openState());
+            } else {
+                config.openState = ko.observable(config.openState);
+            }
             config.positioning = config.positioning || {};
             config.clickHandler = config.clickHandler === false ? false : true;
             if (HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal) !== -1) {
@@ -83,8 +88,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 $popupHolder.appendTo($('body'));
                 $popupHolder.css('position', 'absolute');
                 var innerBindingContext = ('data' in config) ?
-                    bindingContext.createChildContext(ko.utils.unwrapObservable(config.data, config.as)) :  // Given an explicit 'data' value, we create a child binding context for it
-                    bindingContext;                                               // Given no explicit 'data' value, we retain the same binding context
+                    bindingContext.createChildContext(config.data, config.as) :  // Given an explicit 'data' value, we create a child binding context for it
+                    bindingContext;                                              // Given no explicit 'data' value, we retain the same binding context
                 ko.renderTemplate(config.template, innerBindingContext, [], $popupHolder[0]);
                 ko.utils.domNodeDisposal.addDisposeCallback(element, removePopup);
             }
