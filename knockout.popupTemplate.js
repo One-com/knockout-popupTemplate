@@ -268,6 +268,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 positioning: {},
                 anchorHandler: true,
                 outsideHandler: true,
+                closeOnEsc: true,
                 disposalCallBack: null
             };
 
@@ -286,7 +287,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             var $popupHolder = popup.$popupHolder;
             var $element = $(element);
 
-            if (config.outsideHandler) {
+            if (config.outsideHandler || config.closeOnEsc) {
                 config.afterOpen = callInSequence(addCloseHandler, config.afterOpen);
                 config.beforeClose = callInSequence(config.beforeClose, removeCloseHandler);
             }
@@ -312,6 +313,12 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 }
             }
 
+            function closePopupHandlerOnEsc(event) {
+                if (event.which === 27 && config.openState()) {
+                    config.openState(false);
+                }
+            }
+
             function eachIFrameContents(callback) {
                 $('iframe').each(function (index, iframe) {
                     var src = iframe.src;
@@ -324,16 +331,36 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
             function addCloseHandler() {
                 eachIFrameContents(function (index, doc) {
-                    doc.addEventListener('mousedown', closePopupHandler, true);
+                    if (config.outsideHandler) {
+                        doc.addEventListener('mousedown', closePopupHandler, true);
+                    }
+                    if (config.closeOnEsc) {
+                        doc.addEventListener('keyup', closePopupHandlerOnEsc, true);
+                    }
                 });
-                document.addEventListener('mousedown', closePopupHandler, true);
+                if (config.outsideHandler) {
+                    document.addEventListener('mousedown', closePopupHandler, true);
+                }
+                if (config.closeOnEsc) {
+                    document.addEventListener('keyup', closePopupHandlerOnEsc, true);
+                }
             }
 
             function removeCloseHandler() {
                 eachIFrameContents(function (index, doc) {
-                    doc.removeEventListener('mousedown', closePopupHandler, true);
+                    if (config.outsideHandler) {
+                        doc.removeEventListener('mousedown', closePopupHandler, true);
+                    }
+                    if (config.closeOnEsc) {
+                        doc.removeEventListener('keyup', closePopupHandlerOnEsc, true);
+                    }
                 });
-                document.removeEventListener('mousedown', closePopupHandler, true);
+                if (config.outsideHandler) {
+                    document.removeEventListener('mousedown', closePopupHandler, true);
+                }
+                if (config.closeOnEsc) {
+                    document.removeEventListener('keyup', closePopupHandlerOnEsc, true);
+                }
             }
 
 

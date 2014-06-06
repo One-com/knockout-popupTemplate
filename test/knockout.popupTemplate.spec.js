@@ -37,7 +37,6 @@ describe('popupTemplate', function () {
         $(selector)[0].dispatchEvent(event);
     }
 
-
     describe('defaults', function () {
         beforeEach(function () {
             $('<div id="anchor1" data-bind="popupTemplate: \'popupTemplate\'">Popup1</div>').appendTo($testElement);
@@ -128,6 +127,17 @@ describe('popupTemplate', function () {
             click('#anchor1'); // Show popup
             expect('body>.popupTemplate>#template', 'to be rendered');
             click($iframeBody.find('#clicktarget')); // Click in iframe
+            expect('body>.popupTemplate>#template', 'not to be rendered');
+        });
+
+        it.skip('closes when escape is hit', function () {
+            click('#anchor1'); // Show popup
+            expect('body>.popupTemplate>#template', 'to be rendered');
+            // TODO: Getting the triggerKey method to work proved to
+            //       be harder than expected this method must work in
+            //       browsers and phantomjs. Skipping the test for
+            //       now. Verified this to work manually.
+            // triggerKey('keyup', 'esc');
             expect('body>.popupTemplate>#template', 'not to be rendered');
         });
 
