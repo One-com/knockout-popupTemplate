@@ -283,6 +283,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             config = configFixupOpenState(config);
 
             var popup = new Popup(element, bindingContext, config);
+            var popupReposition = popup.reposition.bind(popup);
 
             var $popupHolder = popup.$popupHolder;
             var $element = $(element);
@@ -344,6 +345,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 if (config.closeOnEsc) {
                     document.addEventListener('keyup', closePopupHandlerOnEsc, true);
                 }
+                window.addEventListener('resize', popupReposition, false);
             }
 
             function removeCloseHandler() {
@@ -361,6 +363,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 if (config.closeOnEsc) {
                     document.removeEventListener('keyup', closePopupHandlerOnEsc, true);
                 }
+                window.removeEventListener('resize', popupReposition, false);
             }
 
 
