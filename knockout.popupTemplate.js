@@ -182,11 +182,11 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
     Popup.prototype.keepInViewport = function (position) {
         var boundingRect = this.$popupHolder[0].getBoundingClientRect();
-        if (position.left + boundingRect.width > window.innerWidth + window.scrollX) {
-            position.left = Math.max(window.innerWidth + window.scrollX - boundingRect.width, 0);
+        if (position.left + boundingRect.width > window.innerWidth + window.pageXOffset) {
+            position.left = Math.max(window.innerWidth + window.pageXOffset - boundingRect.width, 0);
         }
-        if (position.top + boundingRect.height > window.innerHeight + window.scrollY) {
-            position.top = Math.max(window.innerHeight + window.scrollY - boundingRect.height, 0);
+        if (position.top + boundingRect.height > window.innerHeight + window.pageYOffset) {
+            position.top = Math.max(window.innerHeight + window.pageYOffset - boundingRect.height, 0);
         }
         return position;
     };
