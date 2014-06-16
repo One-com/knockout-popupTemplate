@@ -1,5 +1,7 @@
 # knockout.popupTemplate
 
+[![NPM version](https://badge.fury.io/js/knockout-popup-template.svg)](http://badge.fury.io/js/knockout-popup-template)
+
 This binding ties an element (called the anchor) to a template (called the popup), which will pop up on screen next to it. By default it works similarly to a dropdown menu, the popup being rendered on initialization, appearing below and aligned to the left edge of the anchor, shown when the anchor is clicked, and hidden if the user clicks outside the popup.
 
 ## Usage
