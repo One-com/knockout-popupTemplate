@@ -401,225 +401,186 @@ describe('popupTemplate', function () {
         });
 
         describe('positioning', function () {
-            var config;
-            beforeEach(function () {
-                $('<div id="anchor" data-bind="popupTemplate: config" style="margin-left: 300px; width: 200px; height: 50px; padding: 5px; border: 1px solid black;">Popup</div>').appendTo($testElement);
+            describe('configuration', function () {
+                var config;
+                var configFixupPositioning = ko.bindingHandlers.popupTemplate._internals.configFixupPositioning;
+                it('accepts string positioning', function () {
+                    config = configFixupPositioning({
+                        positioning: {
+                            horizontal: 'outside-right',
+                            vertical: 'middle'
+                        }
+                    });
+
+                    expect(config.positioning.horizontal, 'to equal', ko.observable('outside-right'));
+                    expect(config.positioning.vertical, 'to equal', ko.observable('middle'));
+                });
+
+                it('accepts empty or invalid observable positioning', function () {
+                    config = configFixupPositioning({
+                        positioning: {
+                            horizontal: ko.observable(),
+                            vertical: ko.observable('invalid')
+                        }
+                    });
+
+                    expect(config.positioning.horizontal, 'to equal', ko.observable('inside-left'));
+                    expect(config.positioning.vertical, 'to equal', ko.observable('outside-bottom'));
+                });
+
+                it('accepts valid observable positioning', function () {
+                    config = configFixupPositioning({
+                        positioning: {
+                            horizontal: ko.observable('middle'),
+                            vertical: ko.observable('outside-top')
+                        }
+                    });
+
+                    expect(config.positioning.horizontal, 'to equal', ko.observable('middle'));
+                    expect(config.positioning.vertical, 'to equal', ko.observable('outside-top'));
+                });
             });
 
-            it('accepts string positioning', function () {
-                config = {
-                    template: 'popupTemplate',
-                    positioning: {
-                        horizontal: 'outside-right',
-                        vertical: 'middle'
-                    }
+            describe('calculation', function () {
+                var config;
+                var popup;
+                var anchorPosition = { left: 200, top: 200 };
+                var popupFactory = function (options) {
+                    options = { positioning: options };
+                    options = ko.bindingHandlers.popupTemplate._internals.configFixupPositioning(options);
+                    options.openState = ko.observable(false);
+                    var element = '';
+                    var bindingContext = {};
+                    return new ko.bindingHandlers.popupTemplate._internals.Popup(element, bindingContext, options);
                 };
-                ko.applyBindings({ config: config }, $testElement[0]);
-                expect(config.positioning.horizontal, 'to equal', ko.observable('outside-right'));
-                expect(config.positioning.vertical, 'to equal', ko.observable('middle'));
+                var positionFactory = function (left, top) {
+                    return {
+                        left: left,
+                        top: top
+                    };
+                };
+
+                beforeEach(function () {
+                    popup = null;
+                });
+
+                it('horizontal alignment outside-left', function () {
+                    popup = popupFactory({ horizontal: 'outside-left' });
+
+                    popup.$popupHolder.outerWidth = sinon.stub().returns(100);
+
+                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(100, 200));
+                });
+
+                it('horizontal alignment inside-left', function () {
+                    popup = popupFactory({ horizontal: 'inside-left' });
+
+                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(200, 200));
+                });
+
+                it('horizontal alignment middle', function () {
+                    popup = popupFactory({ horizontal: 'middle' });
+
+                    popup.$element.outerWidth = sinon.stub().returns(20);
+                    popup.$popupHolder.width = sinon.stub().returns(100);
+
+                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(160, 200));
+                });
+
+                it('horizontal alignment inside-right', function () {
+                    popup = popupFactory({ horizontal: 'inside-right' });
+
+                    popup.$element.outerWidth = sinon.stub().returns(10);
+                    popup.$popupHolder.width = sinon.stub().returns(100);
+
+                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(110, 200));
+                });
+
+                it('horizontal alignment outside-right', function () {
+                    popup = popupFactory({ horizontal: 'outside-right' });
+
+                    popup.$element.outerWidth = sinon.stub().returns(10);
+
+                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(210, 200));
+                });
+
+                it('vertical alignment outside-top', function () {
+                    popup = popupFactory({ vertical: 'outside-top' });
+
+                    popup.$popupHolder.height = sinon.stub().returns(100);
+
+                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(200, 100));
+                });
+
+                it('vertical alignment inside-top', function () {
+                    popup = popupFactory({ vertical: 'inside-top' });
+
+                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(200, 200));
+                });
+
+                it('vertical alignment middle', function () {
+                    popup = popupFactory({ vertical: 'middle' });
+
+                    popup.$popupHolder.height = sinon.stub().returns(100);
+                    popup.$element.outerHeight = sinon.stub().returns(20);
+
+                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(200, 160));
+                });
+
+                it('vertical alignment inside-bottom', function () {
+                    popup = popupFactory({ vertical: 'inside-bottom' });
+
+                    popup.$popupHolder.height = sinon.stub().returns(100);
+                    popup.$element.outerHeight = sinon.stub().returns(20);
+
+                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(200, 120));
+                });
+                it('vertical alignment outside-bottom', function () {
+                    popup = popupFactory({vertical: 'outside-bottom' });
+
+                    popup.$element.outerHeight = sinon.stub().returns(20);
+
+                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(200, 220));
+                });
             });
 
-            it('accepts empty or invalid observable positioning', function () {
-                config = {
-                    template: 'popupTemplate',
-                    positioning: {
-                        horizontal: ko.observable(),
-                        vertical: ko.observable('invalid')
-                    }
-                };
-                ko.applyBindings({ config: config }, $testElement[0]);
-                expect(config.positioning.horizontal, 'to equal', ko.observable('inside-left'));
-                expect(config.positioning.vertical, 'to equal', ko.observable('outside-bottom'));
-            });
+            describe('repositioning', function () {
+                var config;
+                var Popup = ko.bindingHandlers.popupTemplate._internals.Popup;
+                var origKeepInViewport;
 
-            it('accepts valid observable positioning', function () {
-                config = {
-                    template: 'popupTemplate',
-                    positioning: {
-                        horizontal: ko.observable('middle'),
-                        vertical: ko.observable('outside-top')
-                    }
-                };
-                ko.applyBindings({ config: config }, $testElement[0]);
-                expect(config.positioning.horizontal, 'to equal', ko.observable('middle'));
-                expect(config.positioning.vertical, 'to equal', ko.observable('outside-top'));
-            });
+                before(function () {
+                    origKeepInViewport = Popup.prototype.keepInViewport;
+                    Popup.prototype.keepInViewport = sinon.stub().returnsArg(0);
+                });
 
-            it('horizontal alignment outside-left', function () {
-                config = {
-                    template: 'popupTemplate',
-                    positioning: {
-                        horizontal: 'outside-left'
-                    }
-                };
-                ko.applyBindings({ config: config }, $testElement[0]);
-                var $anchor = $('#anchor');
-                click('#anchor');
-                var $popup = $('body>.popupTemplate');
-                var popupPosition = $popup.offset();
-                var elementPosition = $anchor.offset();
-                expect(popupPosition.left, 'to be', elementPosition.left - $popup.outerWidth());
-            });
+                after(function () {
+                    Popup.prototype.keepInViewport = origKeepInViewport;
+                });
 
-            it('horizontal alignment inside-left', function () {
-                config = {
-                    template: 'popupTemplate',
-                    positioning: {
-                        horizontal: 'inside-left'
-                    }
-                };
-                ko.applyBindings({ config: config }, $testElement[0]);
-                var $anchor = $('#anchor');
-                click('#anchor');
-                var popupPosition = $('body>.popupTemplate').offset();
-                var elementPosition = $anchor.offset();
-                expect(popupPosition.left, 'to be', elementPosition.left);
-            });
+                beforeEach(function () {
+                    $('<div id="anchor" data-bind="popupTemplate: config" style="margin-left: 300px; width: 200px; height: 50px; padding: 5px; border: 1px solid black;">Popup</div>').appendTo($testElement);
+                });
 
-            it('horizontal alignment middle', function () {
-                config = {
-                    template: 'popupTemplate',
-                    positioning: {
-                        horizontal: 'middle'
-                    }
-                };
-                ko.applyBindings({ config: config }, $testElement[0]);
-                config.positioning.horizontal('middle');
-                click('#anchor');
-                var $anchor = $('#anchor');
-                var $popup = $('body>.popupTemplate');
-                expect($popup.offset().left + Math.round($popup.width() / 2), 'to be', $anchor.offset().left + Math.round($anchor.outerWidth() / 2));
-            });
-
-            it('horizontal alignment inside-right', function () {
-                config = {
-                    template: 'popupTemplate',
-                    positioning: {
-                        horizontal: 'inside-right'
-                    }
-                };
-                ko.applyBindings({ config: config }, $testElement[0]);
-                var $anchor = $('#anchor');
-                click('#anchor');
-                var $popup = $('body>.popupTemplate');
-                var popupPosition = $popup.offset();
-                var elementPosition = $anchor.offset();
-                expect(popupPosition.left + $popup.width(), 'to be', elementPosition.left + $anchor.outerWidth());
-            });
-
-            it('horizontal alignment outside-right', function () {
-                config = {
-                    template: 'popupTemplate',
-                    positioning: {
-                        horizontal: 'outside-right'
-                    }
-                };
-                ko.applyBindings({ config: config }, $testElement[0]);
-                var $anchor = $('#anchor');
-                click('#anchor');
-                var $popup = $('body>.popupTemplate');
-                var popupPosition = $popup.offset();
-                var elementPosition = $anchor.offset();
-                expect(popupPosition.left, 'to be', elementPosition.left + $anchor.outerWidth());
-            });
-
-            it('vertical alignment outside-top', function () {
-                config = {
-                    template: 'popupTemplate',
-                    positioning: {
-                        vertical: 'outside-top'
-                    }
-                };
-                ko.applyBindings({ config: config }, $testElement[0]);
-                var $anchor = $('#anchor');
-                click('#anchor');
-                var $popup = $('body>.popupTemplate');
-                var popupPosition = $popup.offset();
-                var elementPosition = $anchor.offset();
-                expect(popupPosition.top, 'to be', elementPosition.top - $popup.height());
-            });
-
-            it('vertical alignment inside-top', function () {
-                config = {
-                    template: 'popupTemplate',
-                    positioning: {
-                        vertical: 'inside-top'
-                    }
-                };
-                ko.applyBindings({ config: config }, $testElement[0]);
-                var $anchor = $('#anchor');
-                click('#anchor');
-                var $popup = $('body>.popupTemplate');
-                var popupPosition = $popup.offset();
-                var elementPosition = $anchor.offset();
-                expect(popupPosition.top, 'to be', elementPosition.top);
-            });
-
-            it('vertical alignment middle', function () {
-                config = {
-                    template: 'popupTemplate',
-                    positioning: {
-                        vertical: 'middle'
-                    }
-                };
-                ko.applyBindings({ config: config }, $testElement[0]);
-                config.positioning.vertical('middle');
-                var $anchor = $('#anchor');
-                click('#anchor');
-                var $popup = $('body>.popupTemplate');
-                expect($popup.offset().top + Math.round($popup.height() / 2), 'to be', $anchor.offset().top + Math.round($anchor.outerHeight() / 2));
-            });
-
-            it('vertical alignment inside-bottom', function () {
-                config = {
-                    template: 'popupTemplate',
-                    positioning: {
-                        vertical: 'inside-bottom'
-                    }
-                };
-                ko.applyBindings({ config: config }, $testElement[0]);
-                var $anchor = $('#anchor');
-                click('#anchor');
-                var $popup = $('body>.popupTemplate');
-                var popupPosition = $popup.offset();
-                var elementPosition = $anchor.offset();
-                expect(popupPosition.top + $popup.height(), 'to be', elementPosition.top + $anchor.outerHeight());
-            });
-
-
-            it('vertical alignment outside-bottom', function () {
-                config = {
-                    template: 'popupTemplate',
-                    positioning: {
-                        vertical: 'outside-bottom'
-                    }
-                };
-                ko.applyBindings({ config: config }, $testElement[0]);
-                var $anchor = $('#anchor');
-                click('#anchor');
-                var popupPosition = $('body>.popupTemplate').offset();
-                var elementPosition = $anchor.offset();
-                expect(popupPosition.top, 'to be', elementPosition.top + $anchor.outerHeight());
-            });
-
-            it('can reposition while open', function () {
-                config = {
-                    template: 'popupTemplate',
-                    positioning: {
-                        horizontal: ko.observable('inside-left'),
-                        vertical: ko.observable('outside-bottom')
-                    }
-                };
-                ko.applyBindings({ config: config }, $testElement[0]);
-                var $anchor = $('#anchor');
-                click('#anchor');
-                var $popup = $('body>.popupTemplate');
-                expect($popup.offset().left, 'to be', $anchor.offset().left);
-                expect($popup.offset().top, 'to be', $anchor.offset().top + $anchor.outerHeight());
-                config.positioning.horizontal('outside-left');
-                expect($popup.offset().left, 'to be', $anchor.offset().left - $popup.outerWidth());
-                config.positioning.vertical('inside-bottom');
-                expect($popup.offset().top + $popup.height(), 'to be', $anchor.offset().top + $anchor.outerHeight());
+                it('while open', function () {
+                    config = {
+                        template: 'popupTemplate',
+                        positioning: {
+                            horizontal: ko.observable('inside-left'),
+                            vertical: ko.observable('outside-bottom')
+                        }
+                    };
+                    ko.applyBindings({ config: config }, $testElement[0]);
+                    var $anchor = $('#anchor');
+                    click('#anchor');
+                    var $popup = $('body>.popupTemplate');
+                    expect($popup.offset().left, 'to be', $anchor.offset().left);
+                    expect($popup.offset().top, 'to be', $anchor.offset().top + $anchor.outerHeight());
+                    config.positioning.horizontal('outside-left');
+                    expect($popup.offset().left, 'to be', $anchor.offset().left - $popup.outerWidth());
+                    config.positioning.vertical('inside-bottom');
+                    expect($popup.offset().top + $popup.height(), 'to be', $anchor.offset().top + $anchor.outerHeight());
+                });
             });
         });
         describe('className', function () {

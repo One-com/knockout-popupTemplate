@@ -138,46 +138,51 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     Popup.prototype.reposition = function () {
         if (!this.$popupHolder) { return; }
         var position = this.$element.offset();
-        switch (this.options.positioning.horizontal()) {
-        case 'outside-left':
-            position.left -= this.$popupHolder.outerWidth();
-            break;
-        case 'inside-left':
-            // No change in left coord.
-            break;
-        case 'middle':
-            position.left += Math.round(this.$element.outerWidth() / 2);
-            position.left -= Math.round(this.$popupHolder.width() / 2);
-            break;
-        case 'inside-right':
-            position.left += this.$element.outerWidth();
-            position.left -= this.$popupHolder.width();
-            break;
-        case 'outside-right':
-            position.left += this.$element.outerWidth();
-            break;
-        }
-        switch (this.options.positioning.vertical()) {
-        case 'outside-top':
-            position.top -= this.$popupHolder.height();
-            break;
-        case 'inside-top':
-            // No change in top coord
-            break;
-        case 'middle':
-            position.top += Math.round(this.$element.outerHeight() / 2);
-            position.top -= Math.round(this.$popupHolder.height() / 2);
-            break;
-        case 'inside-bottom':
-            position.top += this.$element.outerHeight();
-            position.top -= this.$popupHolder.height();
-            break;
-        case 'outside-bottom':
-            position.top += this.$element.outerHeight();
-            break;
-        }
+        position = this.calculateInitialPosition(position);
         position = this.keepInViewport(position);
         this.$popupHolder.offset(position);
+    };
+
+    Popup.prototype.calculateInitialPosition = function (position) {
+        switch (this.options.positioning.horizontal()) {
+            case 'outside-left':
+                position.left -= this.$popupHolder.outerWidth();
+                break;
+            case 'inside-left':
+                // No change in left coord.
+                break;
+            case 'middle':
+                position.left += Math.round(this.$element.outerWidth() / 2);
+                position.left -= Math.round(this.$popupHolder.width() / 2);
+                break;
+            case 'inside-right':
+                position.left += this.$element.outerWidth();
+                position.left -= this.$popupHolder.width();
+                break;
+            case 'outside-right':
+                position.left += this.$element.outerWidth();
+                break;
+        }
+        switch (this.options.positioning.vertical()) {
+            case 'outside-top':
+                position.top -= this.$popupHolder.height();
+                break;
+            case 'inside-top':
+                // No change in top coord
+                break;
+            case 'middle':
+                position.top += Math.round(this.$element.outerHeight() / 2);
+                position.top -= Math.round(this.$popupHolder.height() / 2);
+                break;
+            case 'inside-bottom':
+                position.top += this.$element.outerHeight();
+                position.top -= this.$popupHolder.height();
+                break;
+            case 'outside-bottom':
+                position.top += this.$element.outerHeight();
+                break;
+        }
+        return position;
     };
 
     Popup.prototype.keepInViewport = function (position) {
@@ -268,6 +273,11 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     }
 
     ko.bindingHandlers.popupTemplate = {
+        _internals: {
+            Popup: Popup,
+            configFixupPositioning: configFixupPositioning,
+            configFixupOpenState: configFixupOpenState
+        },
         init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
             var config = valueAccessor();
             var defaultConfiguration = {
