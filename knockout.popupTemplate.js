@@ -144,44 +144,37 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     };
 
     Popup.prototype.calculateInitialPosition = function (position) {
-        switch (this.options.positioning.horizontal()) {
-            case 'outside-left':
-                position.left -= this.$popupHolder.outerWidth();
-                break;
-            case 'inside-left':
-                // No change in left coord.
-                break;
-            case 'middle':
-                position.left += Math.round(this.$element.outerWidth() / 2);
-                position.left -= Math.round(this.$popupHolder.width() / 2);
-                break;
-            case 'inside-right':
-                position.left += this.$element.outerWidth();
-                position.left -= this.$popupHolder.width();
-                break;
-            case 'outside-right':
-                position.left += this.$element.outerWidth();
-                break;
+        var horizontal = this.options.positioning.horizontal(),
+            vertical = this.options.positioning.vertical();
+
+        if (horizontal === 'outside-left') {
+            position.left -= this.$popupHolder.outerWidth();
+        } else if (horizontal === 'middle') {
+            position.left += Math.round(this.$element.outerWidth() / 2);
+            position.left -= Math.round(this.$popupHolder.width() / 2);
+        } else if (horizontal === 'inside-right') {
+            position.left += this.$element.outerWidth();
+            position.left -= this.$popupHolder.width();
+        } else if (horizontal === 'outside-right') {
+            position.left += this.$element.outerWidth();
         }
-        switch (this.options.positioning.vertical()) {
-            case 'outside-top':
-                position.top -= this.$popupHolder.height();
-                break;
-            case 'inside-top':
-                // No change in top coord
-                break;
-            case 'middle':
-                position.top += Math.round(this.$element.outerHeight() / 2);
-                position.top -= Math.round(this.$popupHolder.height() / 2);
-                break;
-            case 'inside-bottom':
-                position.top += this.$element.outerHeight();
-                position.top -= this.$popupHolder.height();
-                break;
-            case 'outside-bottom':
-                position.top += this.$element.outerHeight();
-                break;
+        // We do not do anything for the horizontal option inside-left:
+        // We want it to have the same left coordinate as the anchor.
+
+        if (vertical === 'outside-top') {
+            position.top -= this.$popupHolder.height();
+        } else if (vertical === 'middle') {
+            position.top += Math.round(this.$element.outerHeight() / 2);
+            position.top -= Math.round(this.$popupHolder.height() / 2);
+        } else if (vertical === 'inside-bottom') {
+            position.top += this.$element.outerHeight();
+            position.top -= this.$popupHolder.height();
+        } else if (vertical === 'outside-bottom') {
+            position.top += this.$element.outerHeight();
         }
+        // We do not do anything for the vertical option inside-top:
+        // We want it to have the same top coordinate as the anchor.
+
         return position;
     };
 
