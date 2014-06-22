@@ -602,6 +602,52 @@ describe('popupTemplate', function () {
                 });
             });
 
+            describe('keepInViewport', function () {
+                var initTemplatePos;
+                var templateRect;
+                var windowObj;
+                var Popup = ko.bindingHandlers.popupTemplate._internals.Popup;
+                var keepInViewport = function () {
+                    return Popup.prototype.keepInViewport(initTemplatePos, templateRect, windowObj);
+                };
+
+                expect.addAssertion('to be positioned at', function (expect, subject, left, top) {
+                    expect(subject, 'to have property', 'left', left);
+                    expect(subject, 'to have property', 'top', top);
+                });
+
+                beforeEach(function () {
+                    initTemplatePos = {
+                        left: 200,
+                        top: 200
+                    };
+                    templateRect = {
+                        width: 200,
+                        height: 200
+                    };
+                    windowObj = {
+                        innerWidth: 600,
+                        innerHeight: 400,
+                        pageXOffset: 0,
+                        pageYOffset: 0
+                    };
+                });
+
+                it('should not change the position if the popup can fit within bounds', function () {
+                    expect(keepInViewport(), 'to be positioned at', 200, 200);
+                });
+
+                it('should not go out of the right side of the screen', function () {
+                    initTemplatePos.left = 500;
+                    expect(keepInViewport(), 'to be positioned at', 400, 200);
+                });
+
+                it('should not go out of over the bottom of the screen', function () {
+                    initTemplatePos.top = 250;
+                    expect(keepInViewport(), 'to be positioned at', 200, 200);
+                });
+            });
+
             describe('repositioning', function () {
                 var config;
                 var Popup = ko.bindingHandlers.popupTemplate._internals.Popup;
