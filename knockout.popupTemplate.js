@@ -141,8 +141,9 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     Popup.prototype.reposition = function () {
         if (!this.$popupHolder) { return; }
         var position = this.$element.offset();
+        var boundingRect = this.$popupHolder[0].getBoundingClientRect();
         position = this.calculateInitialPosition(position);
-        position = this.keepInViewport(position);
+        position = this.keepInViewport(position, boundingRect, window);
         this.$popupHolder.offset(position);
     };
 
@@ -181,8 +182,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         return position;
     };
 
-    Popup.prototype.keepInViewport = function (position) {
-        var boundingRect = this.$popupHolder[0].getBoundingClientRect();
+    Popup.prototype.keepInViewport = function (position, boundingRect, window) {
         if (position.left + boundingRect.width > window.innerWidth + window.pageXOffset) {
             position.left = Math.max(window.innerWidth + window.pageXOffset - boundingRect.width, 0);
         }
