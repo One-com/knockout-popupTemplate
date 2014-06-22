@@ -439,6 +439,24 @@ describe('popupTemplate', function () {
                     expect(config.positioning.horizontal, 'to equal', ko.observable('middle'));
                     expect(config.positioning.vertical, 'to equal', ko.observable('outside-top'));
                 });
+
+                it('take a string for configuration instead of an object', function () {
+                    config = configFixupPositioning({
+                        positioning: 'outside-right middle'
+                    });
+
+                    expect(config.positioning.horizontal, 'to equal', ko.observable('outside-right'));
+                    expect(config.positioning.vertical, 'to equal', ko.observable('middle'));
+                });
+
+                it('allow passing only horizontal value when passing string', function () {
+                    config = configFixupPositioning({
+                        positioning: 'outside-right'
+                    });
+
+                    expect(config.positioning.horizontal, 'to equal', ko.observable('outside-right'));
+                    expect(config.positioning.vertical, 'to equal', ko.observable('outside-bottom'));
+                });
             });
 
             describe('calculation', function () {

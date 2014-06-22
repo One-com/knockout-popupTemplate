@@ -233,6 +233,17 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     var VERTICAL_POSITIONS = ['outside-top', 'inside-top', 'middle', 'inside-bottom', 'outside-bottom'];
 
     function configFixupPositioning(config) {
+        if (typeof config.positioning === 'string') {
+            var positioningTokens = config.positioning.split(' ');
+            config.positioning = {};
+            if (positioningTokens[0]) {
+                config.positioning.horizontal = positioningTokens[0];
+            }
+            if (positioningTokens[1]) {
+                config.positioning.vertical = positioningTokens[1];
+            }
+        }
+
         if (HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal) !== -1) {
             config.positioning.horizontal = ko.observable(config.positioning.horizontal);
         } else if (ko.isObservable(config.positioning.horizontal) && HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal()) !== -1) {
