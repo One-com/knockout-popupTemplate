@@ -66,6 +66,9 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         this.$popupHolder = this.createElementContainer();
 
         this.subscriptions.push(this.options.openState.subscribe(this.observe.bind(this)));
+        this.subscriptions.push(this.options.template.subscribe(function () {
+            this.render();
+        }.bind(this)));
 
         if (this.options.renderOnInit) {
             this.render();
@@ -122,7 +125,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         var innerBindingContext = ('data' in this.options) ?
             this.bindingContext.createChildContext(this.options.data) :  // Given an explicit 'data' value, we create a child binding context for it
             this.bindingContext;                                               // Given no explicit 'data' value, we retain the same binding context
-        ko.renderTemplate(this.options.template, innerBindingContext, { afterRender: done }, this.$popupHolder[0]);
+        ko.renderTemplate(this.options.template(), innerBindingContext, { afterRender: done }, this.$popupHolder[0]);
         ko.utils.domNodeDisposal.addDisposeCallback(this.element, this.remove.bind(this));
     };
 
@@ -300,8 +303,16 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
             if (typeof config === 'string') {
                 config = {
+                    template: ko.observable(config)
+                };
+            } else if (ko.isObservable(config) && typeof config() === 'string') {
+                config = {
                     template: config
                 };
+            } else if (config.hasOwnProperty('template')) {
+                if (!ko.isObservable(config.template)) {
+                    config.template = ko.observable(config.template);
+                }
             }
 
             config = ko.utils.extend(defaultConfiguration, config);

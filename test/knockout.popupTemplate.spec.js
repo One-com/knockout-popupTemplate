@@ -188,6 +188,45 @@ describe('popupTemplate', function () {
             });
         });
 
+        describe('observable template', function () {
+            it('should be able to render a template passed as an observable', function () {
+                $('<div id="anchor" data-bind="popupTemplate: config">Popup</div>').appendTo($testElement);
+                var bindingContext = {
+                    config: {
+                        template: ko.observable('popupTemplate')
+                    }
+                };
+                ko.applyBindings(bindingContext, $testElement[0]);
+                click('#anchor');
+                expect('body>.popupTemplate>#template', 'to be rendered');
+            });
+            it('should be able to render a template passed as an observable directly', function () {
+                $('<div id="anchor" data-bind="popupTemplate: config">Popup</div>').appendTo($testElement);
+                var bindingContext = {
+                    config: ko.observable('popupTemplate')
+                };
+                ko.applyBindings(bindingContext, $testElement[0]);
+                click('#anchor');
+                expect('body>.popupTemplate>#template', 'to be rendered');
+            });
+            it('should be able to rerender when the template observable changes.', function () {
+                $('<div id="anchor" data-bind="popupTemplate: config">Popup</div>').appendTo($testElement);
+                var bindingContext = {
+                    config: {
+                        template: ko.observable('popupTemplate'),
+                        data: {
+                            testText: 'the template changed!'
+                        }
+                    }
+                };
+                ko.applyBindings(bindingContext, $testElement[0]);
+                click('#anchor');
+                expect($('body>.popupTemplate>#template').html(), 'to be', 'popup');
+                bindingContext.config.template('popupTemplate2');
+                expect($('body>.popupTemplate>#template').html(), 'to be', 'the template changed!');
+            });
+        });
+
         describe('start open', function () {
             describe('renderOnOpen', function () {
                 beforeEach(function () {
@@ -467,6 +506,7 @@ describe('popupTemplate', function () {
                     options = { positioning: options };
                     options = ko.bindingHandlers.popupTemplate._internals.configFixupPositioning(options);
                     options.openState = ko.observable(false);
+                    options.template = ko.observable('bogus');
                     var element = '';
                     var bindingContext = {};
                     return new ko.bindingHandlers.popupTemplate._internals.Popup(element, bindingContext, options);
