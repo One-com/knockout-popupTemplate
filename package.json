@@ -2,7 +2,7 @@
   "name": "knockout-popup-template",
   "description": "A flexible, simple Knockout binding for popping up a template near an anchor element.",
   "main": "knockout.popupTemplate.js",
-  "version": "0.6.7",
+  "version": "0.6.8",
   "contributors": [
     {
       "name": "Gert K. Sønderby",
