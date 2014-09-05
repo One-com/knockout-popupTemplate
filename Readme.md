@@ -19,6 +19,7 @@ This will give the default behavior, outlined above. Alternatively, the binding 
 - `template`: *Required.* A string containing the name of the template to render.
 - `data`: Data model to use rendering the template.
 - `renderOnInit`: If truthy, the popup is rendered at init and merely shown or hidden, instead of being rendered on each open.
+- `closeOnClickInPopup`: If truthy, clicking inside a popup will close it. Useful for menus and similar.
 - `openState`: An observable that is updated to follow the state of the popup. The popup can also be shown or hidden by setting the observable to true or false.
 - `beforeOpen`: An event handler to be called before opening the popup.
 - `afterOpen`: An event handler to be called immediately after opening the popup.

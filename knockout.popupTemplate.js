@@ -298,6 +298,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 anchorHandler: true,
                 outsideHandler: true,
                 closeOnEsc: true,
+                closeOnClickInPopup: false,
                 disposalCallBack: null
             };
 
@@ -345,7 +346,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                     var target = event.target || document.elementFromPoint(event.pageX || event.clientX, event.pageY || event.clientY);
                     var isPopup = $popupHolder.is(target) || $popupHolder.has(target).length > 0;
                     var isAnchor = $element.is(target) || $element.has(target).length > 0;
-                    if (!isPopup && !isAnchor) {
+                    if (!isAnchor && (!isPopup || config.closeOnClickInPopup)) {
                         config.openState(false);
                     }
                 }

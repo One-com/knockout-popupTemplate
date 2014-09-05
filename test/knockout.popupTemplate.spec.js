@@ -293,6 +293,31 @@ describe('popupTemplate', function () {
             });
         });
 
+        describe('closeOnClickInPopup', function () {
+            beforeEach(function () {
+                $('<div id="anchor" data-bind="popupTemplate: { template: \'popupTemplate\', closeOnClickInPopup: true } ">Popup1</div>').appendTo($testElement);
+                var bindingContext = {};
+                ko.applyBindings(bindingContext, $testElement[0]);
+            });
+
+            it('shows the popup when element is clicked', function () {
+                click('#anchor');
+                expect('body>.popupTemplate>#template', 'to be rendered');
+            });
+
+            it('hides the popup again on click outside popup', function () {
+                click('#anchor'); // Show popup
+                click('body'); // Click outside
+                expect('body>.popupTemplate>#template', 'not to be rendered');
+            });
+
+            it('hides the popup again on click inside popup', function () {
+                click('#anchor'); // Show popup
+                click('body>.popupTemplate>#template'); // Click in popup
+                expect('body>.popupTemplate>#template', 'not to be rendered');
+            });
+        });
+
         describe('state observable', function () {
             var popupState;
             beforeEach(function () {
