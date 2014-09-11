@@ -346,7 +346,17 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                     var target = event.target || document.elementFromPoint(event.pageX || event.clientX, event.pageY || event.clientY);
                     var isPopup = $popupHolder.is(target) || $popupHolder.has(target).length > 0;
                     var isAnchor = $element.is(target) || $element.has(target).length > 0;
-                    if (!isAnchor && (!isPopup || config.closeOnClickInPopup)) {
+                    if (!isAnchor && !isPopup) {
+                        config.openState(false);
+                    }
+                }
+            }
+
+            function closeOnClickInPopupHandler(event) {
+                if (event.which === 1 && config.openState()) {
+                    var target = event.target || document.elementFromPoint(event.pageX || event.clientX, event.pageY || event.clientY);
+                    var isPopup = $popupHolder.is(target) || $popupHolder.has(target).length > 0;
+                    if (isPopup && config.closeOnClickInPopup) {
                         config.openState(false);
                     }
                 }
@@ -372,6 +382,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 eachIFrameContents(function (index, doc) {
                     if (config.outsideHandler) {
                         doc.addEventListener('mousedown', closePopupHandler, true);
+                        doc.addEventListener('click', closeOnClickInPopupHandler, true);
                     }
                     if (config.closeOnEsc) {
                         doc.addEventListener('keyup', closePopupHandlerOnEsc, true);
@@ -379,6 +390,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 });
                 if (config.outsideHandler) {
                     document.addEventListener('mousedown', closePopupHandler, true);
+                    document.addEventListener('click', closeOnClickInPopupHandler, true);
                 }
                 if (config.closeOnEsc) {
                     document.addEventListener('keyup', closePopupHandlerOnEsc, true);
@@ -390,6 +402,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 eachIFrameContents(function (index, doc) {
                     if (config.outsideHandler) {
                         doc.removeEventListener('mousedown', closePopupHandler, true);
+                        doc.removeEventListener('click', closeOnClickInPopupHandler, true);
                     }
                     if (config.closeOnEsc) {
                         doc.removeEventListener('keyup', closePopupHandlerOnEsc, true);
@@ -397,6 +410,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 });
                 if (config.outsideHandler) {
                     document.removeEventListener('mousedown', closePopupHandler, true);
+                    document.removeEventListener('click', closeOnClickInPopupHandler, true);
                 }
                 if (config.closeOnEsc) {
                     document.removeEventListener('keyup', closePopupHandlerOnEsc, true);

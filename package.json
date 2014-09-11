@@ -35,9 +35,9 @@
   "devDependencies": {
     "mocha": "=1.9.0",
     "sinon": "=1.9.1",
-    "unexpected": "=3.1.1",
+    "unexpected": "=4.1.6",
     "unexpected-sinon": "=3.0.1",
-    "unexpected-knockout": "=0.0.1",
+    "unexpected-knockout": "=4.0.2",
     "mocha-phantomjs": "=3.3.2",
     "phantomjs": "=1.9.7-4"
   },
