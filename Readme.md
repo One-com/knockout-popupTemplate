@@ -30,6 +30,7 @@ This will give the default behavior, outlined above. Alternatively, the binding 
 - `positioning`: An object containing positioning information (see below).
 - `className`: A string containing a class name to put in the class attribute of the popupTemplate container.
 - `disposalCallback`: A function, that will take care of removing the popupTemplate container from the DOM. This is usefull if you wish to use animations with renderOnOpen mode. The function is passed one argument which is a reference to the element containing the popupTemplate.
+- ` disable`: If this is truthy, or an obseravble containing a truthy value, opening the popup is disabled.
 
 ```html
 <div data-bind="popupTemplate: { template: 'templateName' }">Anchor text</div>

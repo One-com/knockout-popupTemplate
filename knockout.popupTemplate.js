@@ -88,9 +88,19 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         }.bind(this));
     }
 
+    Popup.prototype.disabled = function () {
+        var disabler = this.options.disable;
+        if (ko.isObservable(disabler)) {
+            return !!disabler();
+        } else {
+            return !!disabler;
+        }
+    };
+
     Popup.prototype.observe = function (newValue) {
         var that = this;
         if (newValue) {
+            if (this.disabled()) return;
             // if the popup is being opened
             this.options.beforeOpen();
             this.open(function () {
@@ -299,7 +309,8 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 outsideHandler: true,
                 closeOnEsc: true,
                 closeOnClickInPopup: false,
-                disposalCallBack: null
+                disposalCallBack: null,
+                disable: null
             };
 
             if (typeof config === 'string') {

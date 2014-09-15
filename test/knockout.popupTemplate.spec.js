@@ -398,6 +398,49 @@ describe('popupTemplate', function () {
             });
         });
 
+        describe('disable switch', function () {
+            var config;
+            var applyBindings = function () {
+                ko.applyBindings({ config: config }, $testElement[0]);
+            };
+            beforeEach(function () {
+                $('<div id="anchor" data-bind="popupTemplate: config">Popup</div>').appendTo($testElement);
+                config = {
+                    template: 'popupTemplate'
+                };
+            });
+
+            it('shows the popup when element is clicked when \'disable\' is false', function () {
+                config.disable = false;
+                applyBindings();
+                mouseDown('#anchor');
+                expect('body>.popupTemplate>#template', 'to be rendered');
+                expect('body>.popupTemplate>#template', 'to be visible');
+            });
+
+            it('does not show the popup when element is clicked when \'disable\' is true', function () {
+                config.disable = true;
+                applyBindings();
+                mouseDown('#anchor');
+                expect('body>.popupTemplate>#template', 'not to be rendered');
+            });
+
+            it('shows the popup when element is clicked when \'disable\' is a falsy observable', function () {
+                config.disable = ko.observable(false);
+                applyBindings();
+                mouseDown('#anchor');
+                expect('body>.popupTemplate>#template', 'to be rendered');
+                expect('body>.popupTemplate>#template', 'to be visible');
+            });
+
+            it('does not show the popup when element is clicked when \'disable\' is a truthy observable', function () {
+                config.disable = ko.observable(true);
+                applyBindings();
+                mouseDown('#anchor');
+                expect('body>.popupTemplate>#template', 'not to be rendered');
+            });
+        });
+
         describe('handlers', function () {
             var beforeOpen, afterOpen, beforeClose, afterClose, popupState;
             beforeEach(function () {
