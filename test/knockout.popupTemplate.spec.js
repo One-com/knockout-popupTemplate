@@ -729,6 +729,16 @@ describe('popupTemplate', function () {
                     initTemplatePos.top = 250;
                     expect(keepInViewport(), 'to be positioned at', 200, 200);
                 });
+
+                it('should never go out of the left side of the screen', function () {
+                    initTemplatePos.left = -100;
+                    expect(keepInViewport(), 'to be positioned at', 0, 200);
+                });
+
+                it('should never go out of the top of the screen', function () {
+                    initTemplatePos.top = -100;
+                    expect(keepInViewport(), 'to be positioned at', 200, 0);
+                });
             });
 
             describe('repositioning', function () {

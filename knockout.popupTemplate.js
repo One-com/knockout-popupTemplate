@@ -199,6 +199,15 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         if (position.top + boundingRect.height > window.innerHeight + window.pageYOffset) {
             position.top = Math.max(window.innerHeight + window.pageYOffset - boundingRect.height, 0);
         }
+
+       if (position.left - boundingRect.width < 0) {
+            position.left = 0;
+        }
+
+        if (position.top - boundingRect.height < 0) {
+            position.top = 0;
+        }
+
         return position;
     };
 
