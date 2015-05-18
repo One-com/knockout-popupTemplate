@@ -826,7 +826,7 @@ describe('popupTemplate', function () {
                 applyBindings();
                 config.openState(true); // open popup
                 ko.removeNode(element); // tear anchor out
-                expect(config.disposalCallback, 'was called with', expect.it('to be', $('body>.popupTemplate')[0]));
+                expect(config.disposalCallback, 'was called with', $('body>.popupTemplate')[0]);
                 $('body>.popupTemplate').remove(); // Clean up the template
             });
 
@@ -835,7 +835,7 @@ describe('popupTemplate', function () {
                 applyBindings();
                 config.openState(true); // open popup
                 config.openState(false); // close popup
-                expect(config.disposalCallback, 'was called with', expect.it('to be', $('body>.popupTemplate')[0]));
+                expect(config.disposalCallback, 'was called with', $('body>.popupTemplate')[0]);
                 $('body>.popupTemplate').remove(); // Clean up the template
             });
 

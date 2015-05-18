@@ -41,7 +41,7 @@
     "sinon": "1.11.1",
     "unexpected": "7.4.0",
     "unexpected-knockout": "5.1.4",
-    "unexpected-sinon": "6.1.0"
+    "unexpected-sinon": "6.1.2"
   },
   "license": "BSD-3-Clause"
 }
