@@ -593,6 +593,39 @@ describe('popupTemplate', function () {
                     expect(config.positioning.horizontal, 'to equal', ko.observable('outside-right'));
                     expect(config.positioning.vertical, 'to equal', ko.observable('outside-bottom'));
                 });
+
+                it('annotate the popup container with the positions', function () {
+                    $('<div data-bind="popupTemplate: config">Popup</div>').appendTo($testElement);
+                    var config = {
+                        template: 'popupTemplate',
+                        renderOnInit: true,
+                        openState: ko.observable(true),
+                        positioning: {
+                            horizontal: ko.observable('inside-left'),
+                            vertical: ko.observable()
+                        }
+                    };
+                    var bindingContext = {
+                        config: config
+                    };
+                    ko.applyBindings(bindingContext, $testElement[0]);
+
+                    expect('body>.popupTemplate', 'to have classes',
+                           'horizontal-inside-left',
+                           'vertical-outside-bottom');
+
+                    ['outside-left', 'inside-left', 'middle', 'inside-right', 'outside-right'].forEach(function (horizontalPosition) {
+                        ['outside-top', 'inside-top', 'middle', 'inside-bottom', 'outside-bottom'].forEach(function (verticalPosition) {
+                            config.positioning.horizontal(horizontalPosition);
+                            config.positioning.vertical(verticalPosition);
+
+                            expect('body>.popupTemplate', 'to have classes',
+                                   'horizontal-' + horizontalPosition,
+                                   'vertical-' + verticalPosition);
+                        });
+                    });
+                });
+
             });
 
             describe('calculation', function () {

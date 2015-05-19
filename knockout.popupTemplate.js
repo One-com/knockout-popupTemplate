@@ -117,17 +117,41 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
     Popup.prototype.createElementContainer = function () {
         var $popupHolder;
-        var popupClassName = 'popupTemplate';
+        var classes = ['popupTemplate'];
+
         if (this.options.className) {
-            popupClassName += ' ' + this.options.className;
+            classes.push(this.options.className);
         }
-        $popupHolder = $('<div class="' + popupClassName + '"></div>');
+
+        var position = ko.computed(function () {
+            return 'horizontal-' + this.options.positioning.horizontal() +
+                ' vertical-' + this.options.positioning.vertical();
+        }, this);
+        this.subscriptions.push(position);
+
+        classes.push(position());
+
+        $popupHolder = $('<div class="' + classes.join(' ') + '' + '"></div>');
         $popupHolder.css('position', 'absolute');
 
-        this.subscriptions.push(this.options.positioning.horizontal.subscribe(this.reposition.bind(this)));
-        this.subscriptions.push(this.options.positioning.vertical.subscribe(this.reposition.bind(this)));
+
+        this.subscriptions.push(position.subscribe(this.removePositionClasses, this, 'beforeChange'));
+        this.subscriptions.push(position.subscribe(this.setPositionClasses, this));
+
+        this.subscriptions.push(position.subscribe(this.reposition, this));
 
         return $popupHolder;
+    };
+
+
+    Popup.prototype.removePositionClasses = function (positionClasses) {
+        if (!this.$popupHolder) { return; }
+        this.$popupHolder.removeClass(positionClasses);
+    };
+
+    Popup.prototype.setPositionClasses = function (positionClasses) {
+        if (!this.$popupHolder) { return; }
+        this.$popupHolder.toggleClass(positionClasses);
     };
 
     Popup.prototype.render = function (done) {
@@ -150,6 +174,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
     Popup.prototype.reposition = function () {
         if (!this.$popupHolder) { return; }
+
         var position = this.$element.offset();
         var boundingRect = this.$popupHolder[0].getBoundingClientRect();
         position = this.calculateInitialPosition(position);
