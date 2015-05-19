@@ -1,8 +1,22 @@
 /*global expect, ko, $, sinon, describe, it, before, after, beforeEach, afterEach*/
 
 expect.addAssertion('[not] to be visible', function (expect, subject) {
+    expect(subject, 'to be rendered');
     var state = this.flags.not ? 'hidden' : 'visible';
     expect($(subject).css('visibility'), 'to be', state);
+});
+
+expect.addAssertion('[not] to have class', function (expect, subject, className) {
+    expect(subject, 'to be rendered');
+    expect($(subject).hasClass(className), '[not] to be true');
+});
+
+expect.addAssertion('to have classes', function (expect, subject) {
+    var classes = Array.prototype.slice.call(arguments, 2);
+    expect(classes, 'to be non-empty');
+    classes.forEach(function (className) {
+        expect(subject, 'to have class', className);
+    });
 });
 
 expect.addAssertion('[not] to be rendered', function (expect, subject) {
@@ -798,7 +812,7 @@ describe('popupTemplate', function () {
                 applyBindings();
                 config.openState(true);
                 var $popup = $('body>.popupTemplate');
-                expect($popup.hasClass('aTestClassName'), 'to be ok');
+                expect($popup, 'to have class', 'aTestClassName');
             });
         });
         describe('Disposal callback', function () {
@@ -899,23 +913,23 @@ describe('popupTemplate', function () {
             it('should have class open if its open', function () {
                 applyBindings();
                 config.openState(true);
-                expect($('body>.popupTemplate').hasClass('open'), 'to be ok');
+                expect('body>.popupTemplate', 'to have class', 'open');
             });
 
             it('should have class open if its open from the start', function () {
                 config.openState(true);
                 applyBindings();
-                expect($('body>.popupTemplate').hasClass('open'), 'to be ok');
+                expect('body>.popupTemplate', 'to have class', 'open');
             });
 
             it('should have class closed if its not yet removed', function () {
                 config.disposalCallback = function () {}; // dont remove the element when it's closed
                 applyBindings();
                 config.openState(true);
-                expect($('body>.popupTemplate').hasClass('open'), 'to be ok');
+                expect('body>.popupTemplate', 'to have class', 'open');
                 config.openState(false);
-                expect($('body>.popupTemplate').hasClass('open'), 'to be false');
-                expect($('body>.popupTemplate').hasClass('closed'), 'to be true');
+                expect('body>.popupTemplate', 'not to have class', 'open');
+                expect('body>.popupTemplate', 'to have class', 'closed');
                 $('body>.popupTemplate').remove(); // manual cleanup
             });
 
@@ -938,27 +952,27 @@ describe('popupTemplate', function () {
 
                 it('should have class closed if its not yet opened', function () {
                     applyBindings();
-                    expect($('body>.popupTemplate').hasClass('closed'), 'to be ok');
-                    expect($('body>.popupTemplate').hasClass('open'), 'not to be ok');
+                    expect('body>.popupTemplate', 'to have class', 'closed');
+                    expect('body>.popupTemplate', 'not to have class', 'open');
                 });
                 it('should have class open when it is opened', function () {
                     applyBindings();
                     config.openState(true);
-                    expect($('body>.popupTemplate').hasClass('open'), 'to be ok');
-                    expect($('body>.popupTemplate').hasClass('closed'), 'not to be ok');
+                    expect('body>.popupTemplate', 'to have class', 'open');
+                    expect('body>.popupTemplate', 'not to have class', 'closed');
                 });
                 it('should have class open when it is opened from the start', function () {
                     config.openState(true);
                     applyBindings();
-                    expect($('body>.popupTemplate').hasClass('open'), 'to be ok');
-                    expect($('body>.popupTemplate').hasClass('closed'), 'not to be ok');
+                    expect('body>.popupTemplate', 'to have class', 'open');
+                    expect('body>.popupTemplate', 'not to have class', 'closed');
                 });
                 it('should have class closed when it is opened and then closed', function () {
                     applyBindings();
                     config.openState(true);
                     config.openState(false);
-                    expect($('body>.popupTemplate').hasClass('closed'), 'to be ok');
-                    expect($('body>.popupTemplate').hasClass('open'), 'not to be ok');
+                    expect('body>.popupTemplate', 'to have class', 'closed');
+                    expect('body>.popupTemplate', 'not to have class', 'open');
                 });
             });
         });
