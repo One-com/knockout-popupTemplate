@@ -35,6 +35,9 @@
               <button data-bind="popupTemplate: { template: 'test-template', positioning: { horizontal: 'outside-left', vertical: 'outside-bottom' } }">outside-left - outside-bottom</button>
               <br>
               <br>
+              <button data-bind="popupTemplate: { template: 'test-template', positioning: [{ horizontal: 'outside-left', vertical: 'middle' }, { horizontal: 'outside-right', vertical: 'middle' }] }">auto - left and right</button>
+              <br>
+              <br>
               <button data-bind="popupTemplate: positionConfig">Click to select positioning</button>
           </div>
       </div>

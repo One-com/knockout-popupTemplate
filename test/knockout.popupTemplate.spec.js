@@ -548,8 +548,32 @@ describe('popupTemplate', function () {
                         }
                     });
 
-                    expect(config.positioning.horizontal, 'to equal', ko.observable('outside-right'));
-                    expect(config.positioning.vertical, 'to equal', ko.observable('middle'));
+                    var positioning = config.positioning[0];
+                    expect(positioning.horizontal, 'to equal', ko.observable('outside-right'));
+                    expect(positioning.vertical, 'to equal', ko.observable('middle'));
+                });
+
+                it('accepts an array positionings', function () {
+                    config = configFixupPositioning({
+                        positioning: [
+                            {
+                                horizontal: 'outside-right',
+                                vertical: 'middle'
+                            },
+                            'inside-left outside-bottom'
+                        ]
+                    });
+
+                    expect(config.positioning, 'to satisfy', [
+                        {
+                            horizontal: ko.observable('outside-right'),
+                            vertical: ko.observable('middle')
+                        },
+                        {
+                            horizontal: ko.observable('inside-left'),
+                            vertical: ko.observable('outside-bottom')
+                        }
+                    ]);
                 });
 
                 it('accepts empty or invalid observable positioning', function () {
@@ -560,8 +584,10 @@ describe('popupTemplate', function () {
                         }
                     });
 
-                    expect(config.positioning.horizontal, 'to equal', ko.observable('inside-left'));
-                    expect(config.positioning.vertical, 'to equal', ko.observable('outside-bottom'));
+                    expect(config.positioning, 'to satisfy', [{
+                        horizontal: ko.observable('inside-left'),
+                        vertical: ko.observable('outside-bottom')
+                    }]);
                 });
 
                 it('accepts valid observable positioning', function () {
@@ -572,8 +598,10 @@ describe('popupTemplate', function () {
                         }
                     });
 
-                    expect(config.positioning.horizontal, 'to equal', ko.observable('middle'));
-                    expect(config.positioning.vertical, 'to equal', ko.observable('outside-top'));
+                    expect(config.positioning, 'to satisfy', [{
+                        horizontal: ko.observable('middle'),
+                        vertical: ko.observable('outside-top')
+                    }]);
                 });
 
                 it('take a string for configuration instead of an object', function () {
@@ -581,8 +609,10 @@ describe('popupTemplate', function () {
                         positioning: 'outside-right middle'
                     });
 
-                    expect(config.positioning.horizontal, 'to equal', ko.observable('outside-right'));
-                    expect(config.positioning.vertical, 'to equal', ko.observable('middle'));
+                    expect(config.positioning, 'to satisfy', [{
+                        horizontal: ko.observable('outside-right'),
+                        vertical: ko.observable('middle')
+                    }]);
                 });
 
                 it('allow passing only horizontal value when passing string', function () {
@@ -590,8 +620,10 @@ describe('popupTemplate', function () {
                         positioning: 'outside-right'
                     });
 
-                    expect(config.positioning.horizontal, 'to equal', ko.observable('outside-right'));
-                    expect(config.positioning.vertical, 'to equal', ko.observable('outside-bottom'));
+                    expect(config.positioning, 'to satisfy', [{
+                        horizontal: ko.observable('outside-right'),
+                        vertical: ko.observable('outside-bottom')
+                    }]);
                 });
 
                 it('annotate the popup container with the positions', function () {
@@ -655,80 +687,92 @@ describe('popupTemplate', function () {
                 it('horizontal alignment outside-left', function () {
                     popup = popupFactory({ horizontal: 'outside-left' });
 
+                    popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
                     popup.$popupHolder.outerWidth = sinon.stub().returns(100);
 
-                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(100, 200));
+                    expect(popup.calculateInitialPosition(), 'to equal', positionFactory(100, 200));
                 });
 
                 it('horizontal alignment inside-left', function () {
                     popup = popupFactory({ horizontal: 'inside-left' });
 
-                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(200, 200));
+                    popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
+
+                    expect(popup.calculateInitialPosition(), 'to equal', positionFactory(200, 200));
                 });
 
                 it('horizontal alignment middle', function () {
                     popup = popupFactory({ horizontal: 'middle' });
 
+                    popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
                     popup.$element.outerWidth = sinon.stub().returns(20);
                     popup.$popupHolder.width = sinon.stub().returns(100);
 
-                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(160, 200));
+                    expect(popup.calculateInitialPosition(), 'to equal', positionFactory(160, 200));
                 });
 
                 it('horizontal alignment inside-right', function () {
                     popup = popupFactory({ horizontal: 'inside-right' });
 
+                    popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
                     popup.$element.outerWidth = sinon.stub().returns(10);
                     popup.$popupHolder.width = sinon.stub().returns(100);
 
-                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(110, 200));
+                    expect(popup.calculateInitialPosition(), 'to equal', positionFactory(110, 200));
                 });
 
                 it('horizontal alignment outside-right', function () {
                     popup = popupFactory({ horizontal: 'outside-right' });
 
+                    popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
                     popup.$element.outerWidth = sinon.stub().returns(10);
 
-                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(210, 200));
+                    expect(popup.calculateInitialPosition(), 'to equal', positionFactory(210, 200));
                 });
 
                 it('vertical alignment outside-top', function () {
                     popup = popupFactory({ vertical: 'outside-top' });
 
+                    popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
                     popup.$popupHolder.height = sinon.stub().returns(100);
 
-                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(200, 100));
+                    expect(popup.calculateInitialPosition(), 'to equal', positionFactory(200, 100));
                 });
 
                 it('vertical alignment inside-top', function () {
                     popup = popupFactory({ vertical: 'inside-top' });
 
-                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(200, 200));
+                    popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
+
+                    expect(popup.calculateInitialPosition(), 'to equal', positionFactory(200, 200));
                 });
 
                 it('vertical alignment middle', function () {
                     popup = popupFactory({ vertical: 'middle' });
 
+                    popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
                     popup.$popupHolder.height = sinon.stub().returns(100);
                     popup.$element.outerHeight = sinon.stub().returns(20);
 
-                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(200, 160));
+                    expect(popup.calculateInitialPosition(), 'to equal', positionFactory(200, 160));
                 });
 
                 it('vertical alignment inside-bottom', function () {
                     popup = popupFactory({ vertical: 'inside-bottom' });
 
+                    popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
                     popup.$popupHolder.height = sinon.stub().returns(100);
                     popup.$element.outerHeight = sinon.stub().returns(20);
 
-                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(200, 120));
+                    expect(popup.calculateInitialPosition(), 'to equal', positionFactory(200, 120));
                 });
                 it('vertical alignment outside-bottom', function () {
                     popup = popupFactory({vertical: 'outside-bottom' });
 
+                    popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
                     popup.$element.outerHeight = sinon.stub().returns(20);
 
-                    expect(popup.calculateInitialPosition(positionFactory(200, 200)), 'to equal', positionFactory(200, 220));
+                    expect(popup.calculateInitialPosition(), 'to equal', positionFactory(200, 220));
                 });
             });
 

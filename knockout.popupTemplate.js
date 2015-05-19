@@ -115,6 +115,14 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         }
     };
 
+    Popup.prototype.getBestPosition = function () {
+        if (this.options.openState()) {
+            return this.options.positioning[0];
+        } else {
+            return this.options.positioning[0];
+        }
+    };
+
     Popup.prototype.createElementContainer = function () {
         var $popupHolder;
         var classes = ['popupTemplate'];
@@ -124,20 +132,21 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         }
 
         var position = ko.computed(function () {
-            return 'horizontal-' + this.options.positioning.horizontal() +
-                ' vertical-' + this.options.positioning.vertical();
+            var positioning = this.getBestPosition();
+            return 'horizontal-' + positioning.horizontal() +
+                ' vertical-' + positioning.vertical();
         }, this);
         this.subscriptions.push(position);
-
         classes.push(position());
 
         $popupHolder = $('<div class="' + classes.join(' ') + '' + '"></div>');
         $popupHolder.css('position', 'absolute');
 
-
         this.subscriptions.push(position.subscribe(this.removePositionClasses, this, 'beforeChange'));
         this.subscriptions.push(position.subscribe(this.setPositionClasses, this));
 
+        this.setPositionClasses();
+        this.reposition();
         this.subscriptions.push(position.subscribe(this.reposition, this));
 
         return $popupHolder;
@@ -175,46 +184,53 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     Popup.prototype.reposition = function () {
         if (!this.$popupHolder) { return; }
 
-        var position = this.$element.offset();
         var boundingRect = this.$popupHolder[0].getBoundingClientRect();
-        position = this.calculateInitialPosition(position);
+        var position = this.calculateInitialPosition();
         position = this.keepInViewport(position, boundingRect, window);
         this.$popupHolder.offset(position);
     };
 
-    Popup.prototype.calculateInitialPosition = function (position) {
-        var horizontal = this.options.positioning.horizontal(),
-            vertical = this.options.positioning.vertical();
+    Popup.prototype.calculateOffset = function (anchorOffset, position) {
+        var offset = ko.utils.extend({}, anchorOffset);
+        var horizontal = position.horizontal(),
+            vertical = position.vertical();
+
+        var $anchor = this.$element;
+        var $popupHolder = this.$popupHolder;
 
         if (horizontal === 'outside-left') {
-            position.left -= this.$popupHolder.outerWidth();
+            offset.left -= $popupHolder.outerWidth();
         } else if (horizontal === 'middle') {
-            position.left += Math.round(this.$element.outerWidth() / 2);
-            position.left -= Math.round(this.$popupHolder.width() / 2);
+            offset.left += Math.round($anchor.outerWidth() / 2);
+            offset.left -= Math.round($popupHolder.width() / 2);
         } else if (horizontal === 'inside-right') {
-            position.left += this.$element.outerWidth();
-            position.left -= this.$popupHolder.width();
+            offset.left += $anchor.outerWidth();
+            offset.left -= $popupHolder.width();
         } else if (horizontal === 'outside-right') {
-            position.left += this.$element.outerWidth();
+            offset.left += $anchor.outerWidth();
         }
         // We do not do anything for the horizontal option inside-left:
         // We want it to have the same left coordinate as the anchor.
 
         if (vertical === 'outside-top') {
-            position.top -= this.$popupHolder.height();
+            offset.top -= $popupHolder.height();
         } else if (vertical === 'middle') {
-            position.top += Math.round(this.$element.outerHeight() / 2);
-            position.top -= Math.round(this.$popupHolder.height() / 2);
+            offset.top += Math.round($anchor.outerHeight() / 2);
+            offset.top -= Math.round($popupHolder.height() / 2);
         } else if (vertical === 'inside-bottom') {
-            position.top += this.$element.outerHeight();
-            position.top -= this.$popupHolder.height();
+            offset.top += $anchor.outerHeight();
+            offset.top -= $popupHolder.height();
         } else if (vertical === 'outside-bottom') {
-            position.top += this.$element.outerHeight();
+            offset.top += $anchor.outerHeight();
         }
         // We do not do anything for the vertical option inside-top:
         // We want it to have the same top coordinate as the anchor.
 
-        return position;
+        return offset;
+    };
+
+    Popup.prototype.calculateInitialPosition = function () {
+        return this.calculateOffset(this.$element.offset(), this.getBestPosition());
     };
 
     Popup.prototype.keepInViewport = function (position, boundingRect, window) {
@@ -274,35 +290,54 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     var HORIZONTAL_POSITIONS = ['outside-left', 'inside-left', 'middle', 'inside-right', 'outside-right'];
     var VERTICAL_POSITIONS = ['outside-top', 'inside-top', 'middle', 'inside-bottom', 'outside-bottom'];
 
+    function stringToPositioning(positionString) {
+        var positioningTokens = positionString.split(' ');
+        var positioning = {};
+        if (positioningTokens[0]) {
+            positioning.horizontal = positioningTokens[0];
+        }
+        if (positioningTokens[1]) {
+            positioning.vertical = positioningTokens[1];
+        }
+        return positioning;
+    }
+
+    function normalizePositioning(positioning) {
+        if (typeof positioning === 'string') {
+            positioning = stringToPositioning(positioning);
+        }
+
+        var vertical = ko.isObservable(positioning.vertical) ?
+            positioning.vertical :
+            ko.observable(positioning.vertical);
+        var horizontal = ko.isObservable(positioning.horizontal) ?
+            positioning.horizontal :
+            ko.observable(positioning.horizontal);
+
+        return {
+            vertical: vertical,
+            horizontal: horizontal
+        };
+    }
+
+    function applyDefaults(positioning) {
+        if (VERTICAL_POSITIONS.indexOf(positioning.vertical.peek()) === -1) {
+            positioning.vertical('outside-bottom');
+        }
+
+        if (HORIZONTAL_POSITIONS.indexOf(positioning.horizontal.peek()) === -1) {
+            positioning.horizontal('inside-left');
+        }
+    }
+
     function configFixupPositioning(config) {
-        if (typeof config.positioning === 'string') {
-            var positioningTokens = config.positioning.split(' ');
-            config.positioning = {};
-            if (positioningTokens[0]) {
-                config.positioning.horizontal = positioningTokens[0];
-            }
-            if (positioningTokens[1]) {
-                config.positioning.vertical = positioningTokens[1];
-            }
-        }
+        var positioning = config.positioning instanceof Array ?
+            config.positioning : [config.positioning];
 
-        if (HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal) !== -1) {
-            config.positioning.horizontal = ko.observable(config.positioning.horizontal);
-        } else if (ko.isObservable(config.positioning.horizontal) && HORIZONTAL_POSITIONS.indexOf(config.positioning.horizontal()) !== -1) {
-        } else if (ko.isObservable(config.positioning.horizontal)) {
-            config.positioning.horizontal('inside-left');
-        } else {
-            config.positioning.horizontal = ko.observable('inside-left');
-        }
-        if (VERTICAL_POSITIONS.indexOf(config.positioning.vertical) !== -1) {
-            config.positioning.vertical = ko.observable(config.positioning.vertical);
-        } else if (ko.isObservable(config.positioning.vertical) && VERTICAL_POSITIONS.indexOf(config.positioning.vertical()) !== -1) {
-        } else if (ko.isObservable(config.positioning.vertical)) {
-            config.positioning.vertical('outside-bottom');
-        } else {
-            config.positioning.vertical = ko.observable('outside-bottom');
-        }
+        positioning = positioning.map(normalizePositioning);
+        positioning.forEach(applyDefaults);
 
+        config.positioning = positioning;
         return config;
     }
 
