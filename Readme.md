@@ -58,6 +58,23 @@ These fields can contain either a string, or an observable containing a string. 
 - `'inside-bottom'`: Align the bottom edge of the popup with the bottom edge of the anchor.
 - `'outside-bottom'`: Align the top edge of the popup with the bottom edge of the anchor.
 
+It is also possible to supply a list of positionings where the best fit would be chosen.
+
+For convinience you can also supply strings containing `"<horizontal> <vertical>"` instead of a position object:
+
+```html
+<div data-bind="popupTemplate: {
+                  template: 'templateName',
+                  'positioning': [
+                    { horizontal: 'middle', vertical: 'middle' },
+                    'outside-left inside-top',
+                    'outside-right middle'
+                  ]
+                }">
+  Anchor text
+</div>
+```
+
 ## Examples
 
 http://one-com.github.io/knockout-popupTemplate/examples/index.html
