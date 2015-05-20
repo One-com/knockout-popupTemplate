@@ -8,12 +8,17 @@ expect.addAssertion('[not] to be visible', function (expect, subject) {
 
 expect.addAssertion('[not] to have class', function (expect, subject, className) {
     expect(subject, 'to be rendered');
-    expect($(subject).hasClass(className), '[not] to be true');
+    this.errorMode = 'nested';
+    var not = !!this.flags.not;
+    if ($(subject).hasClass(className) === not) {
+        expect.fail('has classes {0}', $(subject)[0].className);
+    }
 });
 
 expect.addAssertion('to have classes', function (expect, subject) {
     var classes = Array.prototype.slice.call(arguments, 2);
     expect(classes, 'to be non-empty');
+    this.errorMode = 'bubble';
     classes.forEach(function (className) {
         expect(subject, 'to have class', className);
     });
@@ -625,44 +630,42 @@ describe('popupTemplate', function () {
                         vertical: ko.observable('outside-bottom')
                     }]);
                 });
+            });
 
-                it('annotate the popup container with the positions', function () {
-                    $('<div data-bind="popupTemplate: config">Popup</div>').appendTo($testElement);
-                    var config = {
-                        template: 'popupTemplate',
-                        renderOnInit: true,
-                        openState: ko.observable(true),
-                        positioning: {
-                            horizontal: ko.observable('inside-left'),
-                            vertical: ko.observable()
-                        }
-                    };
-                    var bindingContext = {
-                        config: config
-                    };
-                    ko.applyBindings(bindingContext, $testElement[0]);
+            it('annotate the popup container with the positions', function () {
+                $('<div data-bind="popupTemplate: config">Popup</div>').appendTo($testElement);
+                var config = {
+                    template: 'popupTemplate',
+                    renderOnInit: true,
+                    openState: ko.observable(true),
+                    positioning: {
+                        horizontal: ko.observable('inside-left'),
+                        vertical: ko.observable()
+                    }
+                };
+                var bindingContext = {
+                    config: config
+                };
+                ko.applyBindings(bindingContext, $testElement[0]);
 
-                    expect('body>.popupTemplate', 'to have classes',
-                           'horizontal-inside-left',
-                           'vertical-outside-bottom');
+                expect('body>.popupTemplate', 'to have classes',
+                       'horizontal-inside-left',
+                       'vertical-outside-bottom');
 
-                    ['outside-left', 'inside-left', 'middle', 'inside-right', 'outside-right'].forEach(function (horizontalPosition) {
-                        ['outside-top', 'inside-top', 'middle', 'inside-bottom', 'outside-bottom'].forEach(function (verticalPosition) {
-                            config.positioning.horizontal(horizontalPosition);
-                            config.positioning.vertical(verticalPosition);
+                ['outside-left', 'inside-left', 'middle', 'inside-right', 'outside-right'].forEach(function (horizontalPosition) {
+                    ['outside-top', 'inside-top', 'middle', 'inside-bottom', 'outside-bottom'].forEach(function (verticalPosition) {
+                        config.positioning.horizontal(horizontalPosition);
+                        config.positioning.vertical(verticalPosition);
 
-                            expect('body>.popupTemplate', 'to have classes',
-                                   'horizontal-' + horizontalPosition,
-                                   'vertical-' + verticalPosition);
-                        });
+                        expect('body>.popupTemplate', 'to have classes',
+                               'horizontal-' + horizontalPosition,
+                               'vertical-' + verticalPosition);
                     });
                 });
-
             });
 
             describe('calculation', function () {
                 var config;
-                var popup;
                 var anchorPosition = { left: 200, top: 200 };
                 var popupFactory = function (options) {
                     options = { positioning: options };
@@ -680,12 +683,8 @@ describe('popupTemplate', function () {
                     };
                 };
 
-                beforeEach(function () {
-                    popup = null;
-                });
-
                 it('horizontal alignment outside-left', function () {
-                    popup = popupFactory({ horizontal: 'outside-left' });
+                    var popup = popupFactory({ horizontal: 'outside-left' });
 
                     popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
                     popup.$popupHolder.outerWidth = sinon.stub().returns(100);
@@ -694,7 +693,7 @@ describe('popupTemplate', function () {
                 });
 
                 it('horizontal alignment inside-left', function () {
-                    popup = popupFactory({ horizontal: 'inside-left' });
+                    var popup = popupFactory({ horizontal: 'inside-left' });
 
                     popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
 
@@ -702,7 +701,7 @@ describe('popupTemplate', function () {
                 });
 
                 it('horizontal alignment middle', function () {
-                    popup = popupFactory({ horizontal: 'middle' });
+                    var popup = popupFactory({ horizontal: 'middle' });
 
                     popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
                     popup.$element.outerWidth = sinon.stub().returns(20);
@@ -712,7 +711,7 @@ describe('popupTemplate', function () {
                 });
 
                 it('horizontal alignment inside-right', function () {
-                    popup = popupFactory({ horizontal: 'inside-right' });
+                    var popup = popupFactory({ horizontal: 'inside-right' });
 
                     popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
                     popup.$element.outerWidth = sinon.stub().returns(10);
@@ -722,7 +721,7 @@ describe('popupTemplate', function () {
                 });
 
                 it('horizontal alignment outside-right', function () {
-                    popup = popupFactory({ horizontal: 'outside-right' });
+                    var popup = popupFactory({ horizontal: 'outside-right' });
 
                     popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
                     popup.$element.outerWidth = sinon.stub().returns(10);
@@ -731,7 +730,7 @@ describe('popupTemplate', function () {
                 });
 
                 it('vertical alignment outside-top', function () {
-                    popup = popupFactory({ vertical: 'outside-top' });
+                    var popup = popupFactory({ vertical: 'outside-top' });
 
                     popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
                     popup.$popupHolder.height = sinon.stub().returns(100);
@@ -740,7 +739,7 @@ describe('popupTemplate', function () {
                 });
 
                 it('vertical alignment inside-top', function () {
-                    popup = popupFactory({ vertical: 'inside-top' });
+                    var popup = popupFactory({ vertical: 'inside-top' });
 
                     popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
 
@@ -748,7 +747,7 @@ describe('popupTemplate', function () {
                 });
 
                 it('vertical alignment middle', function () {
-                    popup = popupFactory({ vertical: 'middle' });
+                    var popup = popupFactory({ vertical: 'middle' });
 
                     popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
                     popup.$popupHolder.height = sinon.stub().returns(100);
@@ -758,7 +757,7 @@ describe('popupTemplate', function () {
                 });
 
                 it('vertical alignment inside-bottom', function () {
-                    popup = popupFactory({ vertical: 'inside-bottom' });
+                    var popup = popupFactory({ vertical: 'inside-bottom' });
 
                     popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
                     popup.$popupHolder.height = sinon.stub().returns(100);
@@ -767,13 +766,14 @@ describe('popupTemplate', function () {
                     expect(popup.calculateInitialPosition(), 'to equal', positionFactory(200, 120));
                 });
                 it('vertical alignment outside-bottom', function () {
-                    popup = popupFactory({vertical: 'outside-bottom' });
+                    var popup = popupFactory({vertical: 'outside-bottom' });
 
                     popup.$element.offset = sinon.stub().returns(positionFactory(200, 200));
                     popup.$element.outerHeight = sinon.stub().returns(20);
 
                     expect(popup.calculateInitialPosition(), 'to equal', positionFactory(200, 220));
                 });
+
             });
 
             describe('keepInViewport', function () {
@@ -835,16 +835,6 @@ describe('popupTemplate', function () {
             describe('repositioning', function () {
                 var config;
                 var Popup = ko.bindingHandlers.popupTemplate._internals.Popup;
-                var origKeepInViewport;
-
-                before(function () {
-                    origKeepInViewport = Popup.prototype.keepInViewport;
-                    Popup.prototype.keepInViewport = sinon.stub().returnsArg(0);
-                });
-
-                after(function () {
-                    Popup.prototype.keepInViewport = origKeepInViewport;
-                });
 
                 beforeEach(function () {
                     $('<div id="anchor" data-bind="popupTemplate: config" style="margin-left: 300px; width: 200px; height: 50px; padding: 5px; border: 1px solid black;">Popup</div>').appendTo($testElement);
@@ -868,6 +858,18 @@ describe('popupTemplate', function () {
                     expect($popup.offset().left, 'to be', $anchor.offset().left - $popup.outerWidth());
                     config.positioning.vertical('inside-bottom');
                     expect($popup.offset().top + $popup.height(), 'to be', $anchor.offset().top + $anchor.outerHeight());
+                });
+
+                it('uses the first positioning that would be completely visible', function () {
+                    config = {
+                        template: 'popupTemplate-large',
+                        positioning: [ 'middle outside-top', 'middle outside-bottom' ],
+                        renderOnInit: true,
+                        openState: ko.observable(true)
+                    };
+                    ko.applyBindings({ config: config }, $testElement[0]);
+
+                    expect('body>.popupTemplate', 'to have classes', 'horizontal-middle vertical-outside-bottom');
                 });
             });
         });

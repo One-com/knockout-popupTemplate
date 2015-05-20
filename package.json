@@ -22,7 +22,7 @@
     }
   ],
   "scripts": {
-    "test": "mocha-phantomjs test/index.html"
+    "test": "mocha-phantomjs test/index.html -v 600x800"
   },
   "repository": {
     "type": "git",

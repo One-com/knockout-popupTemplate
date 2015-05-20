@@ -5,7 +5,7 @@
         <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
     </head>
     <body>
-        <div id="test" style="position: absolute; visibility: hidden;"></div>
+        <div id="test" style="position: fixed; visibility: hidden;"></div>
         <div id="mocha"></div>
         <script type="text/html" id="popupTemplate">
             <div id="template" style="border: 1px solid black; height: 50px;">popup</div>
@@ -15,6 +15,9 @@
         </script>
         <script type="text/html" id="popupTemplate3">
             <div id="template3">popup</div>
+        </script>
+        <script type="text/html" id="popupTemplate-large">
+            <div id="template-large" style="height: 200px; width: 200px">popup</div>
         </script>
         <script src="../node_modules/jquery/dist/jquery.js"></script>
         <script src="../node_modules/knockout/build/output/knockout-latest.js"></script>

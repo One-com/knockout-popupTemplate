@@ -63,7 +63,14 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
         this.subscriptions = [];
 
+        this.bestPosition = ko.observable(null);
         this.$popupHolder = this.createElementContainer();
+        this.bestPosition.equalityComparer = function (a, b) {
+            if (!a && b) { return true; }
+            if (a && !b) { return true; }
+            return a.vertical.peek() === b.vertical.peek() &&
+                a.horizontal.peek() === b.horizontal.peek();
+        };
 
         this.subscriptions.push(this.options.openState.subscribe(this.observe.bind(this)));
         this.subscriptions.push(this.options.template.subscribe(function () {
@@ -115,12 +122,46 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         }
     };
 
+    Popup.prototype.isInsideViewport = function (anchorOffset, boundingRect, window, position) {
+        var offset = this.calculateOffset(anchorOffset, position);
+        return (
+            window.pageXOffset <= offset.left &&
+            window.pageYOffset <= offset.top &&
+            offset.left + boundingRect.width <= window.innerWidth + window.pageXOffset &&
+            offset.top + boundingRect.height <= window.innerHeight + window.pageYOffset
+        );
+    };
+
     Popup.prototype.getBestPosition = function () {
-        if (this.options.openState()) {
-            return this.options.positioning[0];
-        } else {
-            return this.options.positioning[0];
+        var positioning = this.options.positioning;
+        if (!this.$popupHolder || !this.options.openState()) {
+            return positioning[0];
         }
+        var anchorOffset = this.$element.offset();
+        var boundingRect = this.$popupHolder[0].getBoundingClientRect();
+
+        var bestCandidate = null;
+        var constrainedOffsets = [];
+        for (var i = 0; i < positioning.length; i += 1) {
+            var popupOffset = this.calculateOffset(anchorOffset, positioning[i]);
+            var constrainedOffset = this.keepInViewport(popupOffset, boundingRect, window);
+
+            var distance = Math.sqrt(Math.pow(constrainedOffset.left - popupOffset.left, 2) +
+                                     Math.pow(constrainedOffset.top - popupOffset.top, 2));
+
+            if (distance === 0) {
+                return positioning[i];
+            }
+
+            if (!bestCandidate || distance < bestCandidate.distance) {
+                bestCandidate = {
+                    position: positioning[i],
+                    distance: distance
+                };
+            }
+
+        }
+        return bestCandidate.position;
     };
 
     Popup.prototype.createElementContainer = function () {
@@ -131,8 +172,10 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             classes.push(this.options.className);
         }
 
+        this.bestPosition(this.getBestPosition());
+
         var position = ko.computed(function () {
-            var positioning = this.getBestPosition();
+            var positioning = this.bestPosition();
             return 'horizontal-' + positioning.horizontal() +
                 ' vertical-' + positioning.vertical();
         }, this);
@@ -184,10 +227,11 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     Popup.prototype.reposition = function () {
         if (!this.$popupHolder) { return; }
 
+        this.bestPosition(this.getBestPosition());
         var boundingRect = this.$popupHolder[0].getBoundingClientRect();
-        var position = this.calculateInitialPosition();
-        position = this.keepInViewport(position, boundingRect, window);
-        this.$popupHolder.offset(position);
+        var offset = this.calculateInitialPosition();
+        offset = this.keepInViewport(offset, boundingRect, window);
+        this.$popupHolder.offset(offset);
     };
 
     Popup.prototype.calculateOffset = function (anchorOffset, position) {
@@ -230,21 +274,22 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     };
 
     Popup.prototype.calculateInitialPosition = function () {
-        return this.calculateOffset(this.$element.offset(), this.getBestPosition());
+        return this.calculateOffset(this.$element.offset(), this.bestPosition());
     };
 
-    Popup.prototype.keepInViewport = function (position, boundingRect, window) {
-        if (position.left + boundingRect.width > window.innerWidth + window.pageXOffset) {
-            position.left = Math.max(window.innerWidth + window.pageXOffset - boundingRect.width, 0);
+    Popup.prototype.keepInViewport = function (offset, boundingRect, window) {
+        var result = ko.utils.extend({}, offset);
+        if (result.left + boundingRect.width > window.innerWidth + window.pageXOffset) {
+            result.left = Math.max(window.innerWidth + window.pageXOffset - boundingRect.width, 0);
         }
-        if (position.top + boundingRect.height > window.innerHeight + window.pageYOffset) {
-            position.top = Math.max(window.innerHeight + window.pageYOffset - boundingRect.height, 0);
+        if (result.top + boundingRect.height > window.innerHeight + window.pageYOffset) {
+            result.top = Math.max(window.innerHeight + window.pageYOffset - boundingRect.height, 0);
         }
 
-        position.left = Math.max(window.pageXOffset, position.left);
-        position.top = Math.max(window.pageYOffset, position.top);
+        result.left = Math.max(window.pageXOffset, result.left);
+        result.top = Math.max(window.pageYOffset, result.top);
 
-        return position;
+        return result;
     };
 
     Popup.prototype.hide = function (done) {
