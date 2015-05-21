@@ -516,6 +516,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                     document.addEventListener('keyup', closePopupHandlerOnEsc, true);
                 }
                 window.addEventListener('resize', popupReposition, false);
+                window.addEventListener('scroll', popupReposition, true);
             }
 
             function removeCloseHandler() {
@@ -536,6 +537,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                     document.removeEventListener('keyup', closePopupHandlerOnEsc, true);
                 }
                 window.removeEventListener('resize', popupReposition, false);
+                window.removeEventListener('scroll', popupReposition, true);
             }
 
 
