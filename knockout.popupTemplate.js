@@ -515,7 +515,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 if (config.closeOnEsc) {
                     document.addEventListener('keyup', closePopupHandlerOnEsc, true);
                 }
-                window.addEventListener('resize', popupReposition, false);
+                ko.utils.registerEventHandler(window, 'resize', popupReposition);
                 window.addEventListener('scroll', popupReposition, true);
             }
 
