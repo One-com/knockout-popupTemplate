@@ -473,10 +473,10 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             }
 
             function closeOnClickInPopupHandler(event) {
-                if (event.which === 1 && config.openState()) {
+                if (event.which === 1 && config.closeOnClickInPopup && config.openState()) {
                     var target = event.target || document.elementFromPoint(event.pageX || event.clientX, event.pageY || event.clientY);
                     var isPopup = $popupHolder.is(target) || $popupHolder.has(target).length > 0;
-                    if (isPopup && config.closeOnClickInPopup) {
+                    if (isPopup) {
                         config.openState(false);
                     }
                 }
