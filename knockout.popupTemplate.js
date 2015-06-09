@@ -208,6 +208,8 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
     Popup.prototype.render = function (done) {
         this.$popupHolder.appendTo($('body'));
+
+        ko.utils.domData.set(this.$popupHolder[0], 'popup', this);
         var innerBindingContext = ('data' in this.options) ?
             this.bindingContext.createChildContext(this.options.data) :  // Given an explicit 'data' value, we create a child binding context for it
             this.bindingContext;                                               // Given no explicit 'data' value, we retain the same binding context
@@ -464,9 +466,19 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             function closePopupHandler(event) {
                 if (event.which === 1 && config.openState()) {
                     var target = event.target || document.elementFromPoint(event.pageX || event.clientX, event.pageY || event.clientY);
-                    var isPopup = $popupHolder.is(target) || $popupHolder.has(target).length > 0;
+
+                    var $targetPopup = $(target).closest('.popupTemplate');
+
+                    var inPopup = $targetPopup.length > 0;
+                    if (inPopup) {
+                        var targetPopup = ko.utils.domData.get($targetPopup[0], 'popup');
+                        var $targetPopupHolder = targetPopup.$popupHolder;
+                        var $targetAnchor = targetPopup.$element;
+                        inPopup = $popupHolder.is($targetPopupHolder) || $popupHolder.has($targetAnchor).length > 0;
+                    }
+
                     var isAnchor = $element.is(target) || $element.has(target).length > 0;
-                    if (!isAnchor && !isPopup) {
+                    if (!isAnchor && !inPopup) {
                         config.openState(false);
                     }
                 }
