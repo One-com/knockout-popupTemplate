@@ -39,9 +39,9 @@
     "mocha-phantomjs": "3.5.1",
     "phantomjs": "1.9.12",
     "sinon": "1.11.1",
-    "unexpected": "7.4.1",
-    "unexpected-knockout": "5.1.4",
-    "unexpected-sinon": "6.1.2"
+    "unexpected": "9.2.0",
+    "unexpected-knockout": "5.2.1",
+    "unexpected-sinon": "6.4.1"
   },
   "license": "BSD-3-Clause"
 }

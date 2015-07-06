@@ -25,11 +25,13 @@
         <script src="../node_modules/unexpected/unexpected.js"></script>
         <script src="../node_modules/unexpected-sinon/lib/unexpected-sinon.js"></script>
         <script src="../node_modules/unexpected-knockout/lib/unexpected-knockout.js"></script>
+        <script src="../node_modules/unexpected-dom/unexpected-dom.js"></script>
         <script src="../node_modules/mocha/mocha.js"></script>
         <script>
             var expect = weknowhow.expect.clone();
             expect.installPlugin(weknowhow.unexpectedSinon);
             expect.installPlugin(weknowhow.unexpectedKnockout);
+            expect.installPlugin(unexpected.dom);
 
             mocha.setup('bdd');
         </script>
