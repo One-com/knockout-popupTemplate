@@ -64,10 +64,10 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         this.subscriptions = [];
 
         this.bestPosition = ko.observable(null);
-        this.$popupHolder = this.createElementContainer();
+        this.$popupHolder = null;
         this.bestPosition.equalityComparer = function (a, b) {
-            if (!a && b) { return true; }
-            if (a && !b) { return true; }
+            if (!a && b) { return false; }
+            if (a && !b) { return false; }
             return a.vertical.peek() === b.vertical.peek() &&
                 a.horizontal.peek() === b.horizontal.peek();
         };
@@ -207,6 +207,10 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     };
 
     Popup.prototype.render = function (done) {
+        if (!this.$popupHolder) {
+            this.$popupHolder = this.createElementContainer();
+        }
+
         this.$popupHolder.appendTo($('body'));
 
         ko.utils.domData.set(this.$popupHolder[0], 'popup', this);
@@ -445,7 +449,6 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             var popup = new Popup(element, bindingContext, config);
             var popupReposition = popup.reposition.bind(popup);
 
-            var $popupHolder = popup.$popupHolder;
             var $element = $(element);
 
             if (config.outsideHandler || config.closeOnEsc) {
@@ -474,6 +477,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                         var targetPopup = ko.utils.domData.get($targetPopup[0], 'popup');
                         var $targetPopupHolder = targetPopup.$popupHolder;
                         var $targetAnchor = targetPopup.$element;
+                        var $popupHolder = popup.$popupHolder;
                         inPopup = $popupHolder.is($targetPopupHolder) || $popupHolder.has($targetAnchor).length > 0;
                     }
 
@@ -487,6 +491,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             function closeOnClickInPopupHandler(event) {
                 if (event.which === 1 && config.closeOnClickInPopup && config.openState()) {
                     var target = event.target || document.elementFromPoint(event.pageX || event.clientX, event.pageY || event.clientY);
+                    var $popupHolder = popup.$popupHolder;
                     var isPopup = $popupHolder.is(target) || $popupHolder.has(target).length > 0;
                     if (isPopup) {
                         config.openState(false);

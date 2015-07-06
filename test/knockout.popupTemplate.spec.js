@@ -674,7 +674,9 @@ describe('popupTemplate', function () {
                     options.template = ko.observable('bogus');
                     var element = '';
                     var bindingContext = {};
-                    return new ko.bindingHandlers.popupTemplate._internals.Popup(element, bindingContext, options);
+                    var popup = new ko.bindingHandlers.popupTemplate._internals.Popup(element, bindingContext, options);
+                    popup.$popupHolder = popup.createElementContainer();
+                    return popup;
                 };
                 var positionFactory = function (left, top) {
                     return {
