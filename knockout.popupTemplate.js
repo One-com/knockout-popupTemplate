@@ -424,6 +424,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 outsideHandler: true,
                 closeOnEsc: true,
                 closeOnClickInPopup: false,
+                addMouseOverEvent: null,
                 disposalCallBack: null,
                 disable: null
             };
@@ -450,6 +451,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             var popupReposition = popup.reposition.bind(popup);
 
             var $element = $(element);
+            var insidePopupTemplate = false;
 
             if (config.outsideHandler || config.closeOnEsc) {
                 config.afterOpen = callInSequence(addCloseHandler, config.afterOpen);
@@ -457,6 +459,8 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             }
 
             if (config.anchorHandler) {
+                var $popupTemplContainer;
+
                 $element.on('mousedown.popupTemplate', function (event) {
                     if (event.which === 1) {
                         config.openState(!config.openState());
@@ -464,6 +468,42 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                         event.preventDefault();
                     }
                 });
+
+                $element.on('mouseover.popupTemplate', function (event) {
+                    if (defaultConfiguration.addMouseOverEvent === true) {
+                        config.openState(true);
+                        $popupTemplContainer = $(popup.$popupHolder[0]);
+
+                        $popupTemplContainer.on('mouseover.popupTemplate', function (event) {
+                            insidePopupTemplate = true;
+
+                        });
+                        $popupTemplContainer.on('mouseleave.popupTemplate', function (event) {
+                            insidePopupTemplate = false;
+                            config.openState(false);
+
+                            removeEventsListener($popupTemplContainer, $element);
+                        });
+
+                        $element.on('mouseleave.popupTemplate', function (event) {
+                            setTimeout(function () {
+                                if (insidePopupTemplate === false) {
+                                    config.openState(false);
+
+                                    removeEventsListener($popupTemplContainer, $element);
+                                }
+                            }, 300);
+                        });
+                        event.stopPropagation();
+                        event.preventDefault();
+                    }
+                });
+            }
+
+            function removeEventsListener($container, $element) {
+                $container.off('mouseleave.popupTemplate');
+                $container.off('mouseenter.popupTemplate');
+                $element.off('mouseleave.popupTemplate');
             }
 
             function closePopupHandler(event) {
