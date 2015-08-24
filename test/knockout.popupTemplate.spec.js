@@ -81,7 +81,7 @@ describe('popupTemplate', function () {
 
     describe('defaults', function () {
         beforeEach(function () {
-            $('<div id="anchor" data-bind="popupTemplate: { template: \'popupTemplate\', addMouseOverEvent: true } ">Popup</div>').appendTo($testElement);
+            $('<div id="anchor" data-bind="popupTemplate: { template: \'popupTemplate\', openOnMouseOver: true } ">Popup</div>').appendTo($testElement);
             $('<div id="anchor1" data-bind="popupTemplate: \'popupTemplate\'">Popup1</div>').appendTo($testElement);
             $('<div id="anchor2" data-bind="popupTemplate: \'popupTemplate3\'">Popup2</div>').appendTo($testElement);
             var bindingContext = {};
@@ -104,7 +104,7 @@ describe('popupTemplate', function () {
             expect('body>.popupTemplate>#template', 'to be visible');
         });
 
-        it('does not show the popup when element is hovered and addMouseOverEvent is null', function () {
+        it('does not show the popup when element is hovered and openOnMouseOver is null', function () {
             mouseOver('#anchor1');
             expect('body>.popupTemplate>#template', 'not to be rendered');
         });

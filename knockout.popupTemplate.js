@@ -424,7 +424,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 outsideHandler: true,
                 closeOnEsc: true,
                 closeOnClickInPopup: false,
-                addMouseOverEvent: null,
+                openOnMouseOver: null,
                 disposalCallBack: null,
                 disable: null
             };
@@ -459,18 +459,9 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             }
 
             if (config.anchorHandler) {
-                var $popupTemplContainer;
-
-                $element.on('mousedown.popupTemplate', function (event) {
-                    if (event.which === 1) {
-                        config.openState(!config.openState());
-                        event.stopPropagation();
-                        event.preventDefault();
-                    }
-                });
-
-                $element.on('mouseover.popupTemplate', function (event) {
-                    if (defaultConfiguration.addMouseOverEvent === true) {
+                if (defaultConfiguration.openOnMouseOver === true) {
+                    var $popupTemplContainer;
+                    $element.on('mouseover.popupTemplate', function (event) {
                         config.openState(true);
                         $popupTemplContainer = $(popup.$popupHolder[0]);
 
@@ -496,8 +487,16 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                         });
                         event.stopPropagation();
                         event.preventDefault();
-                    }
-                });
+                    });
+                } else {
+                    $element.on('mousedown.popupTemplate', function (event) {
+                        if (event.which === 1) {
+                            config.openState(!config.openState());
+                            event.stopPropagation();
+                            event.preventDefault();
+                        }
+                    });
+                }
             }
 
             function removeEventsListener($container, $element) {
