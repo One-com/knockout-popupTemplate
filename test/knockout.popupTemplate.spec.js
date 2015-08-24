@@ -67,12 +67,21 @@ describe('popupTemplate', function () {
         dispatchMouseEvent(selector, { type: 'mousedown' });
     }
 
+    function mouseOver(selector) {
+        dispatchMouseEvent(selector, { type: 'mouseover' });
+    }
+
+    function mouseOut(selector) {
+        dispatchMouseEvent(selector, { type: 'mouseout' });
+    }
+
     function click(selector) {
         dispatchMouseEvent(selector, { type: 'click' });
     }
 
     describe('defaults', function () {
         beforeEach(function () {
+            $('<div id="anchor" data-bind="popupTemplate: { template: \'popupTemplate\', addMouseOverEvent: true } ">Popup</div>').appendTo($testElement);
             $('<div id="anchor1" data-bind="popupTemplate: \'popupTemplate\'">Popup1</div>').appendTo($testElement);
             $('<div id="anchor2" data-bind="popupTemplate: \'popupTemplate3\'">Popup2</div>').appendTo($testElement);
             var bindingContext = {};
@@ -87,6 +96,24 @@ describe('popupTemplate', function () {
             mouseDown('#anchor1');
             expect('body>.popupTemplate>#template', 'to be rendered');
             expect('body>.popupTemplate>#template', 'to be visible');
+        });
+
+        it('shows the popup when element is hovered', function () {
+            mouseOver('#anchor');
+            expect('body>.popupTemplate>#template', 'to be rendered');
+            expect('body>.popupTemplate>#template', 'to be visible');
+        });
+
+        it('does not show the popup when element is hovered and addMouseOverEvent is null', function () {
+            mouseOver('#anchor1');
+            expect('body>.popupTemplate>#template', 'not to be rendered');
+        });
+
+        it('hides the popup on move mouse away from popup', function () {
+            mouseOver('#anchor'); // Show popup
+            mouseOver('body>.popupTemplate>#template'); // Hover on popup
+            mouseOut('body>.popupTemplate>#template'); // Hide popup
+            expect('body>.popupTemplate>#template', 'not to be rendered');
         });
 
         it('removes the popup again on click outside popup', function () {
