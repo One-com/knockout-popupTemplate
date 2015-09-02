@@ -450,6 +450,11 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             var popup = new Popup(element, bindingContext, config);
             var popupReposition = popup.reposition.bind(popup);
 
+            config.beforeOpen = config.beforeOpen.bind(popup);
+            config.afterOpen = config.afterOpen.bind(popup);
+            config.beforeClose = config.beforeClose.bind(popup);
+            config.afterClose = config.afterClose.bind(popup);
+
             var $element = $(element);
             var insidePopupTemplate = false;
 
