@@ -68,14 +68,14 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         this.bestPosition.equalityComparer = function (a, b) {
             if (!a && b) { return false; }
             if (a && !b) { return false; }
-            return a.vertical.peek() === b.vertical.peek() &&
-                a.horizontal.peek() === b.horizontal.peek();
+            return a.vertical === b.vertical &&
+                a.horizontal === b.horizontal;
         };
 
         this.subscriptions.push(this.options.openState.subscribe(this.observe.bind(this)));
         this.subscriptions.push(this.options.template.subscribe(function () {
             this.render();
-        }.bind(this)));
+        }, this));
 
         if (this.options.renderOnInit) {
             this.render();
@@ -135,7 +135,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     Popup.prototype.getBestPosition = function () {
         var positioning = this.options.positioning;
         if (!this.$popupHolder || !this.options.openState()) {
-            return positioning[0];
+            return ko.toJS(positioning[0]);
         }
         var anchorOffset = this.$element.offset();
         var boundingRect = this.$popupHolder[0].getBoundingClientRect();
@@ -143,19 +143,20 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         var bestCandidate = null;
         var constrainedOffsets = [];
         for (var i = 0; i < positioning.length; i += 1) {
-            var popupOffset = this.calculateOffset(anchorOffset, positioning[i]);
+            var position = ko.toJS(positioning[i]);
+            var popupOffset = this.calculateOffset(anchorOffset, position);
             var constrainedOffset = this.keepInViewport(popupOffset, boundingRect, window);
 
             var distance = Math.sqrt(Math.pow(constrainedOffset.left - popupOffset.left, 2) +
                                      Math.pow(constrainedOffset.top - popupOffset.top, 2));
 
             if (distance === 0) {
-                return positioning[i];
+                return position;
             }
 
             if (!bestCandidate || distance < bestCandidate.distance) {
                 bestCandidate = {
-                    position: positioning[i],
+                    position: position,
                     distance: distance
                 };
             }
@@ -165,6 +166,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     };
 
     Popup.prototype.createElementContainer = function () {
+        var that = this;
         var $popupHolder;
         var classes = ['popupTemplate'];
 
@@ -175,9 +177,9 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         this.bestPosition(this.getBestPosition());
 
         var position = ko.computed(function () {
-            var positioning = this.bestPosition();
-            return 'horizontal-' + positioning.horizontal() +
-                ' vertical-' + positioning.vertical();
+            var position = this.bestPosition();
+            return 'horizontal-' + position.horizontal +
+                ' vertical-' + position.vertical;
         }, this);
         this.subscriptions.push(position);
         classes.push(position());
@@ -188,9 +190,15 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         this.subscriptions.push(position.subscribe(this.removePositionClasses, this, 'beforeChange'));
         this.subscriptions.push(position.subscribe(this.setPositionClasses, this));
 
+        // Update when the positioning configuration changes
+        var positioning = ko.computed(function () {
+            return ko.toJS(this.options.positioning);
+        }, this);
+        this.subscriptions.push(positioning);
+        this.subscriptions.push(positioning.subscribe(this.reposition, this));
+
         this.setPositionClasses();
         this.reposition();
-        this.subscriptions.push(position.subscribe(this.reposition, this));
 
         return $popupHolder;
     };
@@ -242,8 +250,8 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
     Popup.prototype.calculateOffset = function (anchorOffset, position) {
         var offset = ko.utils.extend({}, anchorOffset);
-        var horizontal = position.horizontal(),
-            vertical = position.vertical();
+        var horizontal = position.horizontal,
+            vertical = position.vertical;
 
         var $anchor = this.$element;
         var $popupHolder = this.$popupHolder;
