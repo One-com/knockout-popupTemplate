@@ -168,7 +168,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     Popup.prototype.createElementContainer = function () {
         var that = this;
         var $popupHolder;
-        var classes = ['popupTemplate'];
+        var classes = ['popupTemplate', 'popup-container'];
 
         if (this.options.className) {
             classes.push(this.options.className);
@@ -221,7 +221,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
 
         this.$popupHolder.appendTo($('body'));
 
-        ko.utils.domData.set(this.$popupHolder[0], 'popup', this);
+        ko.utils.domData.set(this.$popupHolder[0], 'anchor', this);
         var innerBindingContext = ('data' in this.options) ?
             this.bindingContext.createChildContext(this.options.data) :  // Given an explicit 'data' value, we create a child binding context for it
             this.bindingContext;                                               // Given no explicit 'data' value, we retain the same binding context
@@ -522,11 +522,11 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 if (event.which === 1 && config.openState()) {
                     var target = event.target || document.elementFromPoint(event.pageX || event.clientX, event.pageY || event.clientY);
 
-                    var $targetPopup = $(target).closest('.popupTemplate');
+                    var $targetPopup = $(target).closest('.popup-container');
 
                     var inPopup = $targetPopup.length > 0;
                     if (inPopup) {
-                        var targetPopup = ko.utils.domData.get($targetPopup[0], 'popup');
+                        var targetPopup = ko.utils.domData.get($targetPopup[0], 'anchor');
                         var $targetPopupHolder = targetPopup.$popupHolder;
                         var $targetAnchor = targetPopup.$element;
                         var $popupHolder = popup.$popupHolder;
@@ -574,7 +574,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                         doc.addEventListener('click', closeOnClickInPopupHandler, true);
                     }
                     if (config.closeOnEsc) {
-                        doc.addEventListener('keyup', closePopupHandlerOnEsc, true);
+                        doc.addEventListener('keydown', closePopupHandlerOnEsc, false);
                     }
                 });
                 if (config.outsideHandler) {
@@ -582,7 +582,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                     document.addEventListener('click', closeOnClickInPopupHandler, true);
                 }
                 if (config.closeOnEsc) {
-                    document.addEventListener('keyup', closePopupHandlerOnEsc, true);
+                    document.addEventListener('keydown', closePopupHandlerOnEsc, false);
                 }
                 ko.utils.registerEventHandler(window, 'resize', popupReposition);
                 window.addEventListener('scroll', popupReposition, true);
@@ -595,7 +595,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                         doc.removeEventListener('click', closeOnClickInPopupHandler, true);
                     }
                     if (config.closeOnEsc) {
-                        doc.removeEventListener('keyup', closePopupHandlerOnEsc, true);
+                        doc.removeEventListener('keydown', closePopupHandlerOnEsc, false);
                     }
                 });
                 if (config.outsideHandler) {
@@ -603,7 +603,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                     document.removeEventListener('click', closeOnClickInPopupHandler, true);
                 }
                 if (config.closeOnEsc) {
-                    document.removeEventListener('keyup', closePopupHandlerOnEsc, true);
+                    document.removeEventListener('keydown', closePopupHandlerOnEsc, false);
                 }
                 window.removeEventListener('resize', popupReposition, false);
                 window.removeEventListener('scroll', popupReposition, true);
