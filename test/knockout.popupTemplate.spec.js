@@ -93,7 +93,7 @@ describe('popupTemplate', function () {
         });
 
         it('shows the popup when element is clicked', function () {
-            mouseDown('#anchor1');
+            click('#anchor1');
             expect('body>.popupTemplate>#template', 'to be rendered');
             expect('body>.popupTemplate>#template', 'to be visible');
         });
@@ -117,41 +117,41 @@ describe('popupTemplate', function () {
         });
 
         it('removes the popup again on click outside popup', function () {
-            mouseDown('#anchor1'); // Show popup
+            click('#anchor1'); // Show popup
             expect('body>.popupTemplate>#template', 'to be rendered');
             expect('body>.popupTemplate>#template', 'to be visible');
-            mouseDown('body'); // Click outside
+            click('body'); // Click outside
             expect('body>.popupTemplate>#template', 'not to be rendered');
         });
         it('removes the popup again on anchor click', function () {
-            mouseDown('#anchor1'); // Show popup
+            click('#anchor1'); // Show popup
             expect('body>.popupTemplate>#template', 'to be rendered');
             expect('body>.popupTemplate>#template', 'to be visible');
-            mouseDown('#anchor1'); // Click inside
+            click('#anchor1'); // Click inside
             expect('body>.popupTemplate>#template', 'not to be rendered');
         });
 
         it('works even with many open/closes @slow', function () {
             for (var i = 0; i < 20; i += 1) {
-                mouseDown('#anchor1'); // Show popup
+                click('#anchor1'); // Show popup
                 expect('body>.popupTemplate>#template', 'to be rendered');
                 expect('body>.popupTemplate>#template', 'to be visible');
-                mouseDown('body'); // Click outside
+                click('body'); // Click outside
                 expect('body>.popupTemplate>#template', 'not to be rendered');
             }
         });
 
         it('does not hide on click within the popup', function () {
-            mouseDown('#anchor1'); // Show popup
+            click('#anchor1'); // Show popup
             expect('body>.popupTemplate>#template', 'to be rendered');
             mouseDown('body>.popupTemplate>#template'); // Click inside popup
             expect('body>.popupTemplate>#template', 'to be rendered');
         });
 
         it('closes when a click hits another popup anchor', function () {
-            mouseDown('#anchor1'); // Show popup
+            click('#anchor1'); // Show popup
             expect('body>.popupTemplate>#template', 'to be rendered');
-            mouseDown('#anchor2'); // Show popup
+            click('#anchor2'); // Show popup
             expect('body>.popupTemplate>#template', 'not to be rendered');
             expect('body>.popupTemplate>#template3', 'to be rendered');
         });
@@ -161,9 +161,9 @@ describe('popupTemplate', function () {
             $('#someButton').on('mousedown', function (e) {
                 e.stopPropagation();
             });
-            mouseDown('#anchor1'); // Show popup
+            click('#anchor1'); // Show popup
             expect('body>.popupTemplate>#template', 'to be rendered');
-            mouseDown('#someButton'); // Show popup
+            click('#someButton'); // Show popup
             expect('body>.popupTemplate>#template', 'not to be rendered');
         });
 
@@ -172,7 +172,7 @@ describe('popupTemplate', function () {
             $testElement.append($iframe);
             var $iframeBody = $iframe.contents().find('body');
             $iframeBody.append('<div id="clicktarget">');
-            mouseDown('#anchor1'); // Show popup
+            click('#anchor1'); // Show popup
             expect('body>.popupTemplate>#template', 'to be rendered');
             mouseDown($iframeBody.find('#clicktarget')); // Click in iframe
             expect('body>.popupTemplate>#template', 'not to be rendered');
@@ -185,7 +185,7 @@ describe('popupTemplate', function () {
             $testElement.append($iframe);
             var $iframeBody = $iframe.contents().find('body');
             $iframeBody.append('<div id="clicktarget">');
-            mouseDown('#anchor1'); // Show popup
+            click('#anchor1'); // Show popup
             expect('body>.popupTemplate>#template', 'to be rendered');
             mouseDown($iframeBody.find('#clicktarget')); // Click in iframe
             expect('body>.popupTemplate>#template', 'not to be rendered');
@@ -208,7 +208,7 @@ describe('popupTemplate', function () {
             var $iframeBody = $iframe.contents().find('body');
             $iframeBody.append('<div id="clicktarget">');
             for (var i = 0; i < 20; i += 1) {
-                mouseDown('#anchor1'); // Show popup
+                click('#anchor1'); // Show popup
                 expect('body>.popupTemplate>#template', 'to be rendered');
                 mouseDown($iframeBody.find('#clicktarget')); // Click in iframe
                 expect('body>.popupTemplate>#template', 'not to be rendered');
@@ -217,7 +217,7 @@ describe('popupTemplate', function () {
 
         it('positions the popup just below the element, aligning left borders', function () {
             var $anchor = $('#anchor1');
-            mouseDown('#anchor1');
+            click('#anchor1');
             var popupPosition = $('body>.popupTemplate').offset();
             var elementPosition = $anchor.offset();
             expect(popupPosition.left, 'to be', elementPosition.left);
@@ -258,7 +258,7 @@ describe('popupTemplate', function () {
                     }
                 };
                 ko.applyBindings(bindingContext, $testElement[0]);
-                mouseDown('#anchor');
+                click('#anchor');
                 expect('body>.popupTemplate>#template', 'to be rendered');
             });
             it('should be able to render a template passed as an observable directly', function () {
@@ -267,7 +267,7 @@ describe('popupTemplate', function () {
                     config: ko.observable('popupTemplate')
                 };
                 ko.applyBindings(bindingContext, $testElement[0]);
-                mouseDown('#anchor');
+                click('#anchor');
                 expect('body>.popupTemplate>#template', 'to be rendered');
             });
             it('should be able to rerender when the template observable changes.', function () {
@@ -281,7 +281,7 @@ describe('popupTemplate', function () {
                     }
                 };
                 ko.applyBindings(bindingContext, $testElement[0]);
-                mouseDown('#anchor');
+                click('#anchor');
                 expect($('body>.popupTemplate>#template').html(), 'to be', 'popup');
                 bindingContext.config.template('popupTemplate2');
                 expect($('body>.popupTemplate>#template').html(), 'to be', 'the template changed!');
@@ -342,7 +342,7 @@ describe('popupTemplate', function () {
             });
 
             it('shows the popup when element is clicked', function () {
-                mouseDown('#anchor');
+                click('#anchor');
                 expect('body>.popupTemplate>#template', 'to be visible');
             });
 
@@ -362,18 +362,18 @@ describe('popupTemplate', function () {
             });
 
             it('shows the popup when element is clicked', function () {
-                mouseDown('#anchor');
+                click('#anchor');
                 expect('body>.popupTemplate>#template', 'to be rendered');
             });
 
             it('hides the popup again on click outside popup', function () {
-                mouseDown('#anchor'); // Show popup
-                mouseDown('body'); // Click outside
+                click('#anchor'); // Show popup
+                click('body'); // Click outside
                 expect('body>.popupTemplate>#template', 'not to be rendered');
             });
 
             it('hides the popup again on click inside popup', function () {
-                mouseDown('#anchor'); // Show popup
+                click('#anchor'); // Show popup
                 click('body>.popupTemplate>#template'); // Click in popup
                 expect('body>.popupTemplate>#template', 'not to be rendered');
             });
@@ -394,17 +394,17 @@ describe('popupTemplate', function () {
             });
 
             it('sets the state observable to true when opening the popup', function () {
-                mouseDown('#test>div'); // Show popup
+                click('#test>div'); // Show popup
                 expect(popupState(), 'to be true');
             });
 
             it('resets the state observable to false when closing the popup', function () {
-                mouseDown('#test>div'); // Show popup
-                mouseDown('body'); // Click outside
+                click('#test>div'); // Show popup
+                click('body'); // Click outside
                 expect(popupState(), 'to be false');
             });
             it('closes the popup if config.openState is set to false', function () {
-                mouseDown('#test>div'); // Show popup
+                click('#test>div'); // Show popup
                 expect('body>.popupTemplate>#template', 'to be rendered');
                 popupState(false);
                 expect('body>.popupTemplate>#template', 'not to be rendered');
@@ -459,7 +459,7 @@ describe('popupTemplate', function () {
             it('shows the popup when element is clicked when \'disable\' is false', function () {
                 config.disable = false;
                 applyBindings();
-                mouseDown('#anchor');
+                click('#anchor');
                 expect('body>.popupTemplate>#template', 'to be rendered');
                 expect('body>.popupTemplate>#template', 'to be visible');
             });
@@ -467,14 +467,14 @@ describe('popupTemplate', function () {
             it('does not show the popup when element is clicked when \'disable\' is true', function () {
                 config.disable = true;
                 applyBindings();
-                mouseDown('#anchor');
+                click('#anchor');
                 expect('body>.popupTemplate>#template', 'not to be rendered');
             });
 
             it('shows the popup when element is clicked when \'disable\' is a falsy observable', function () {
                 config.disable = ko.observable(false);
                 applyBindings();
-                mouseDown('#anchor');
+                click('#anchor');
                 expect('body>.popupTemplate>#template', 'to be rendered');
                 expect('body>.popupTemplate>#template', 'to be visible');
             });
@@ -510,15 +510,15 @@ describe('popupTemplate', function () {
             });
 
             it('it calls the beforeOpen and afterOpen hooks in the right order', function () {
-                mouseDown('#test>div'); // Show popup
+                click('#test>div'); // Show popup
                 expect([beforeOpen, afterOpen], 'given call order');
                 expect(beforeOpen, 'was called once');
                 expect(afterOpen, 'was called once');
             });
 
             it('it calls the beforeClose and afterClose hooks in the right order', function () {
-                mouseDown('#test>div'); // Show popup
-                mouseDown('#test>div'); // Close popup
+                click('#test>div'); // Show popup
+                click('#test>div'); // Close popup
                 expect([beforeClose, afterClose], 'given call order');
                 expect(beforeClose, 'was called once');
                 expect(afterClose, 'was called once');
@@ -561,7 +561,7 @@ describe('popupTemplate', function () {
                 ko.applyBindings(bindingContext, $testElement[0]);
             });
             it('should not close on body click.', function () {
-                mouseDown('#test>div'); // Show popup
+                click('#test>div'); // Show popup
                 mouseDown('body'); // Close popup
                 expect(openState(), 'to be true');
                 expect('body>.popupTemplate>#template', 'to be visible');
@@ -879,7 +879,7 @@ describe('popupTemplate', function () {
                     };
                     ko.applyBindings({ config: config }, $testElement[0]);
                     var $anchor = $('#anchor');
-                    mouseDown('#anchor');
+                    click('#anchor');
                     var $popup = $('body>.popupTemplate');
                     expect($popup.offset().left, 'to be', $anchor.offset().left);
                     expect($popup.offset().top, 'to be', $anchor.offset().top + $anchor.outerHeight());

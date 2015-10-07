@@ -502,7 +502,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                         event.preventDefault();
                     });
                 } else {
-                    $element.on('mousedown.popupTemplate', function (event) {
+                    $element.on('click.popupTemplate', function (event) {
                         if (event.which === 1) {
                             config.openState(!config.openState());
                             event.stopPropagation();
@@ -578,7 +578,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                     }
                 });
                 if (config.outsideHandler) {
-                    document.addEventListener('mousedown', closePopupHandler, true);
+                    document.addEventListener('click', closePopupHandler, true);
                     document.addEventListener('click', closeOnClickInPopupHandler, true);
                 }
                 if (config.closeOnEsc) {
