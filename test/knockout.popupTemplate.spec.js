@@ -174,7 +174,7 @@ describe('popupTemplate', function () {
             $iframeBody.append('<div id="clicktarget">');
             click('#anchor1'); // Show popup
             expect('body>.popupTemplate>#template', 'to be rendered');
-            mouseDown($iframeBody.find('#clicktarget')); // Click in iframe
+            click($iframeBody.find('#clicktarget')); // Click in iframe
             expect('body>.popupTemplate>#template', 'not to be rendered');
         });
 
@@ -187,7 +187,7 @@ describe('popupTemplate', function () {
             $iframeBody.append('<div id="clicktarget">');
             click('#anchor1'); // Show popup
             expect('body>.popupTemplate>#template', 'to be rendered');
-            mouseDown($iframeBody.find('#clicktarget')); // Click in iframe
+            click($iframeBody.find('#clicktarget')); // Click in iframe
             expect('body>.popupTemplate>#template', 'not to be rendered');
         });
 
@@ -210,7 +210,7 @@ describe('popupTemplate', function () {
             for (var i = 0; i < 20; i += 1) {
                 click('#anchor1'); // Show popup
                 expect('body>.popupTemplate>#template', 'to be rendered');
-                mouseDown($iframeBody.find('#clicktarget')); // Click in iframe
+                click($iframeBody.find('#clicktarget')); // Click in iframe
                 expect('body>.popupTemplate>#template', 'not to be rendered');
             }
         });
