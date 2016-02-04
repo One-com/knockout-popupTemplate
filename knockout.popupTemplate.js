@@ -332,6 +332,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 that.reposition();
                 that.toggleClasses(true);
                 callMeMaybe(done);
+                that.reposition();
             });
         }
     };
