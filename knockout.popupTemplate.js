@@ -241,14 +241,14 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     Popup.prototype.reposition = function (e) {
         if (!this.$popupHolder) { return; }
 
-        this.bestPosition(this.getBestPosition());
-        var boundingRect = this.$popupHolder[0].getBoundingClientRect();
-
         var scrollTarget = e && e.type === 'scroll' && e.target;
         var isChildScrolling = scrollTarget && this.$popupHolder.has(scrollTarget).length > 0;
         if (isChildScrolling) {
             return;
         }
+
+        this.bestPosition(this.getBestPosition());
+        var boundingRect = this.$popupHolder[0].getBoundingClientRect();
 
         var offset = this.calculateInitialPosition();
         offset = this.keepInViewport(offset, boundingRect, window);
