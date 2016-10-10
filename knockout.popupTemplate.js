@@ -592,7 +592,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 if (config.closeOnEsc) {
                     document.addEventListener('keydown', closePopupHandlerOnEsc, false);
                 }
-                ko.utils.registerEventHandler(window, 'resize', popupReposition);
+                $(window).on('resize', popupReposition);
                 window.addEventListener('scroll', popupReposition, true);
             }
 
@@ -613,7 +613,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 if (config.closeOnEsc) {
                     document.removeEventListener('keydown', closePopupHandlerOnEsc, false);
                 }
-                window.removeEventListener('resize', popupReposition, false);
+                $(window).off('resize', popupReposition);
                 window.removeEventListener('scroll', popupReposition, true);
             }
 
