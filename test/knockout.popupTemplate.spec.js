@@ -692,8 +692,6 @@ describe('popupTemplate', function () {
             });
 
             describe('calculation', function () {
-                var config;
-                var anchorPosition = { left: 200, top: 200 };
                 var popupFactory = function (options) {
                     options = { positioning: options };
                     options = ko.bindingHandlers.popupTemplate._internals.configFixupPositioning(options);
@@ -863,7 +861,6 @@ describe('popupTemplate', function () {
 
             describe('repositioning', function () {
                 var config;
-                var Popup = ko.bindingHandlers.popupTemplate._internals.Popup;
 
                 beforeEach(function () {
                     $('<div id="anchor" data-bind="popupTemplate: config" style="margin-left: 300px; width: 200px; height: 50px; padding: 5px; border: 1px solid black;">Popup</div>').appendTo($testElement);
@@ -999,7 +996,7 @@ describe('popupTemplate', function () {
             });
         });
         describe('open/closed classes', function () {
-            var config, element;
+            var config;
             var applyBindings = function () {
                 ko.applyBindings({ config: config }, $testElement[0]);
             };
@@ -1010,7 +1007,6 @@ describe('popupTemplate', function () {
                     openState: ko.observable(false)
                 };
                 $('<div id="anchor" data-bind="popupTemplate: config" style="margin-left: 300px; width: 200px; height: 50px; padding: 5px; border: 1px solid black;">Popup</div>').appendTo($testElement);
-                element = $('#anchor', $testElement)[0];
             });
 
             afterEach(function () {
@@ -1050,7 +1046,6 @@ describe('popupTemplate', function () {
                         renderOnInit: true
                     };
                     $('<div id="anchor" data-bind="popupTemplate: config" style="margin-left: 300px; width: 200px; height: 50px; padding: 5px; border: 1px solid black;">Popup</div>').appendTo($testElement);
-                    element = $('#anchor', $testElement)[0];
                 });
 
                 afterEach(function () {
