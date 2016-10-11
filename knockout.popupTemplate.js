@@ -367,7 +367,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     Popup.closeOnEsc = {
         elements: [],
         handlerRegistered: false,
-        handler: function () {
+        handler: function (event) {
             if (Popup.closeOnEsc.elements.length > 0) {
                 var lastIndex = Popup.closeOnEsc.elements.length - 1;
                 var lastItem = Popup.closeOnEsc.elements[lastIndex];
