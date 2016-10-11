@@ -354,6 +354,58 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         }
     };
 
+    function eachIFrameContents(callback) {
+        $('iframe').each(function (index, iframe) {
+            var src = iframe.src;
+            var origin = window.location.origin || location.protocol + '//' + location.host;
+            if (!src || src.indexOf(origin) === 0) {
+                $(iframe).contents().each(callback);
+            }
+        });
+    }
+
+    Popup.closeOnEsc = {
+        elements: [],
+        handlerRegistered: false,
+        handler: function () {
+            if (Popup.closeOnEsc.elements.length > 0) {
+                var lastIndex = Popup.closeOnEsc.elements.length - 1;
+                var lastItem = Popup.closeOnEsc.elements[lastIndex];
+                if (event.which === 27 && lastItem.openState()) {
+                    lastItem.openState(false);
+                }
+            }
+        },
+        setupHandler: function () {
+            if (!Popup.closeOnEsc.handlerRegistered) {
+                document.addEventListener('keydown', Popup.closeOnEsc.handler, false);
+                eachIFrameContents(function (index, doc) {
+                    doc.addEventListener('keydown', Popup.closeOnEsc.handler, false);
+                });
+                Popup.closeOnEsc.handlerRegistered = true;
+            }
+        },
+        tearDownHandler: function () {
+            if (Popup.closeOnEsc.handlerRegistered && Popup.closeOnEsc.elements.length === 0) {
+                document.removeEventListener('keydown', Popup.closeOnEsc.handler, false);
+                eachIFrameContents(function (index, doc) {
+                    doc.removeEventListener('keydown', Popup.closeOnEsc.handler, false);
+                });
+                Popup.closeOnEsc.handlerRegistered = false;
+            }
+        },
+        registerElement: function (element) {
+            Popup.closeOnEsc.elements.push(element);
+            Popup.closeOnEsc.setupHandler();
+        },
+        unregisterElement: function (element) {
+            Popup.closeOnEsc.elements = Popup.closeOnEsc.elements.filter(function (el) {
+                return el !== element;
+            });
+            Popup.closeOnEsc.tearDownHandler();
+        }
+    };
+
     var HORIZONTAL_POSITIONS = ['outside-left', 'inside-left', 'middle', 'inside-right', 'outside-right'];
     var VERTICAL_POSITIONS = ['outside-top', 'inside-top', 'middle', 'inside-bottom', 'outside-bottom'];
 
@@ -559,30 +611,11 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                 }
             }
 
-            function closePopupHandlerOnEsc(event) {
-                if (event.which === 27 && config.openState()) {
-                    config.openState(false);
-                }
-            }
-
-            function eachIFrameContents(callback) {
-                $('iframe').each(function (index, iframe) {
-                    var src = iframe.src;
-                    var origin = window.location.origin || location.protocol + '//' + location.host;
-                    if (!src || src.indexOf(origin) === 0) {
-                        $(iframe).contents().each(callback);
-                    }
-                });
-            }
-
             function addCloseHandler() {
                 eachIFrameContents(function (index, doc) {
                     if (config.outsideHandler) {
                         doc.addEventListener('click', closePopupHandler, true);
                         doc.addEventListener('click', closeOnClickInPopupHandler, true);
-                    }
-                    if (config.closeOnEsc) {
-                        doc.addEventListener('keydown', closePopupHandlerOnEsc, false);
                     }
                 });
                 if (config.outsideHandler) {
@@ -590,7 +623,7 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                     document.addEventListener('click', closeOnClickInPopupHandler, true);
                 }
                 if (config.closeOnEsc) {
-                    document.addEventListener('keydown', closePopupHandlerOnEsc, false);
+                    Popup.closeOnEsc.registerElement(config);
                 }
                 $(window).on('resize', popupReposition);
                 window.addEventListener('scroll', popupReposition, true);
@@ -602,16 +635,13 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
                         doc.removeEventListener('click', closePopupHandler, true);
                         doc.removeEventListener('click', closeOnClickInPopupHandler, true);
                     }
-                    if (config.closeOnEsc) {
-                        doc.removeEventListener('keydown', closePopupHandlerOnEsc, false);
-                    }
                 });
                 if (config.outsideHandler) {
                     document.removeEventListener('click', closePopupHandler, true);
                     document.removeEventListener('click', closeOnClickInPopupHandler, true);
                 }
                 if (config.closeOnEsc) {
-                    document.removeEventListener('keydown', closePopupHandlerOnEsc, false);
+                    Popup.closeOnEsc.unregisterElement(config);
                 }
                 $(window).off('resize', popupReposition);
                 window.removeEventListener('scroll', popupReposition, true);
