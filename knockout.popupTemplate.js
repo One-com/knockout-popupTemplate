@@ -107,7 +107,9 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     Popup.prototype.observe = function (newValue) {
         var that = this;
         if (newValue) {
-            if (this.disabled()) return;
+            if (this.disabled()) {
+                return;
+            }
             // if the popup is being opened
             this.options.beforeOpen();
             this.open(function () {
@@ -141,7 +143,6 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
         var boundingRect = this.$popupHolder[0].getBoundingClientRect();
 
         var bestCandidate = null;
-        var constrainedOffsets = [];
         for (var i = 0; i < positioning.length; i += 1) {
             var position = ko.toJS(positioning[i]);
             var popupOffset = this.calculateOffset(anchorOffset, position);
@@ -166,7 +167,6 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
     };
 
     Popup.prototype.createElementContainer = function () {
-        var that = this;
         var $popupHolder;
         var classes = ['popupTemplate', 'popup-container'];
 

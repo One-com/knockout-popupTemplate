@@ -26,6 +26,7 @@
     }
   ],
   "scripts": {
+    "lint": "eslint .",
     "test": "mocha-phantomjs test/index.html -v 600x800"
   },
   "repository": {
@@ -37,6 +38,8 @@
     "knockout": ">=3"
   },
   "devDependencies": {
+    "eslint": "3.7.1",
+    "eslint-config-onelint": "1.1.0",
     "jquery": "=1.11.0",
     "knockout": "3.0.0",
     "mocha": "2.0.1",
