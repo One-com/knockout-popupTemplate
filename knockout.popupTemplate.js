@@ -359,7 +359,19 @@ Source code found at https://github.com/One-com/knockout-popupTemplate
             var src = iframe.src;
             var origin = window.location.origin || location.protocol + '//' + location.host;
             if (!src || src.indexOf(origin) === 0) {
-                $(iframe).contents().each(callback);
+                // try...catch to protect against foreign iframes throwing
+                // "Failed to read the 'contentDocument' property from
+                // 'HTMLIFrameElement': Blocked a frame with origin ...
+                // from accessing a cross-origin frame."
+                // Apparently that can happen despite the above check,
+                // maybe because the iframe is missing a src attribute.
+                var $contents;
+                try {
+                    $contents = $(iframe).contents();
+                } catch (e) {}
+                if ($contents) {
+                    $contents.each(callback);
+                }
             }
         });
     }
